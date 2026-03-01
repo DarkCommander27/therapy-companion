@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CareBridge Staff Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1>CareBridge</h1>
+        <p>Staff Portal</p>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-view="overview">
+          📊 Overview
+        </button>
+        <button class="nav-item" data-view="flagged">
+          🚨 Safety Alerts
+        </button>
+        <button class="nav-item" data-view="followups">
+          ✅ Follow-ups
+        </button>
+        <button class="nav-item" data-view="conversations">
+          💬 Conversations
+        </button>
+        <button class="nav-item" data-view="analytics">
+          📈 Analytics
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="refreshBtn" class="btn-refresh">🔄 Refresh</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="dashboard-header">
+        <div class="header-left">
+          <h2 id="pageTitle">Dashboard Overview</h2>
+          <p id="pageSubtitle">Real-time insights into youth wellbeing</p>
+        </div>
+        <div class="header-right">
+          <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search by User ID...">
+            <button class="btn-search">🔍</button>
+          </div>
+          <div class="user-info">
+            <span id="currentTime"></span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Overview View -->
+      <div id="overviewView" class="view active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">💬</div>
+            <div class="stat-content">
+              <h3>Total Messages</h3>
+              <p class="stat-number" id="totalMessages">-</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-content">
+              <h3>Active Children</h3>
+              <p class="stat-number" id="activeChildren">-</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon">🚨</div>
+            <div class="stat-content">
+              <h3>Safety Alerts</h3>
+              <p class="stat-number critical" id="safetyAlerts">-</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-content">
+              <h3>Pending Follow-ups</h3>
+              <p class="stat-number" id="pendingFollowups">-</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card">
+          <h3>Recent Conversations</h3>
+          <div id="recentActivity" class="activity-list">
+            <p class="loading">Loading conversations...</p>
+          </div>
+        </div>
+
+        <!-- Mood Trends -->
+        <div class="card">
+          <h3>Mood Distribution</h3>
+          <div id="moodDistribution" class="mood-grid">
+            <p class="loading">Loading mood data...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flagged Conversations View -->
+      <div id="flaggedView" class="view">
+        <div class="card">
+          <h3>🚨 Safety Alerts & Flagged Conversations</h3>
+          <p class="subtitle">Conversations requiring immediate or follow-up attention</p>
+          <div id="flaggedList" class="conversations-list">
+            <p class="loading">Loading flagged conversations...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Follow-ups View -->
+      <div id="followupsView" class="view">
+        <div class="card">
+          <h3>✅ Staff Follow-up Queue</h3>
+          <p class="subtitle">Conversations awaiting staff review and acknowledgment</p>
+          <div id="followupsList" class="conversations-list">
+            <p class="loading">Loading follow-ups...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Conversations View -->
+      <div id="conversationsView" class="view">
+        <div class="card">
+          <h3>💬 User Conversations</h3>
+          <p class="subtitle">Browse all conversations by user</p>
+          <div id="conversationsList" class="conversations-list">
+            <p class="loading">Loading conversations...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analytics View -->
+      <div id="analyticsView" class="view">
+        <div class="analytics-grid">
+          <div class="card">
+            <h3>📊 Message Statistics</h3>
+            <div id="messageStats" class="stats-content">
+              <p class="loading">Loading statistics...</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>😊 Mood Trends</h3>
+            <div id="moodTrends" class="stats-content">
+              <p class="loading">Loading mood trends...</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>⚠️ Alert Summary</h3>
+            <div id="alertSummary" class="stats-content">
+              <p class="loading">Loading alert summary...</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>🎯 Topics of Concern</h3>
+            <div id="topicsOfConcern" class="stats-content">
+              <p class="loading">Loading topics...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Conversation Detail Modal -->
+  <div id="detailModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="detailTitle">Conversation Details</h2>
+        <button class="btn-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="conversationDetail" class="conversation-detail">
+          <p class="loading">Loading...</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="acknowledgeBtn" class="btn btn-primary" style="display: none;">
+          ✓ Mark as Reviewed
+        </button>
+        <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner"></div>
+    <p>Loading data...</p>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>

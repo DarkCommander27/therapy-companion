@@ -247,4 +247,12 @@ process.on('SIGINT', () => {
   process.exit(0);
 });
 
+// Start server if this file is run directly
+const PORT = process.env.PORT || 3000;
+const server = app.listen(PORT, () => {
+  logger.info(`🚀 Server listening on port ${PORT}`);
+  logger.info(`📍 Health check: http://localhost:${PORT}/health`);
+  logger.info(`💬 Chat endpoint: http://localhost:${PORT}/api/chat`);
+});
+
 module.exports = app;

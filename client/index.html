@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CareBridge Companion</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Setup Screen -->
+    <div id="setupScreen" class="screen active">
+      <div class="setup-container">
+        <div class="setup-header">
+          <h1>Welcome to CareBridge Companion 🤖</h1>
+          <p>Let's personalize your experience</p>
+        </div>
+
+        <!-- Avatar Selection -->
+        <div class="setup-section">
+          <h2>Choose Your Avatar</h2>
+          <div class="avatar-grid">
+            <div class="avatar-option" data-avatar="🤖">
+              <div class="avatar-preview">🤖</div>
+              <p>Robot</p>
+            </div>
+            <div class="avatar-option" data-avatar="🧠">
+              <div class="avatar-preview">🧠</div>
+              <p>Brain</p>
+            </div>
+            <div class="avatar-option" data-avatar="⭐">
+              <div class="avatar-preview">⭐</div>
+              <p>Star</p>
+            </div>
+            <div class="avatar-option" data-avatar="🌟">
+              <div class="avatar-preview">🌟</div>
+              <p>Sparkle</p>
+            </div>
+            <div class="avatar-option" data-avatar="💚">
+              <div class="avatar-preview">💚</div>
+              <p>Heart</p>
+            </div>
+            <div class="avatar-option" data-avatar="🌈">
+              <div class="avatar-preview">🌈</div>
+              <p>Rainbow</p>
+            </div>
+            <div class="avatar-option" data-avatar="🎨">
+              <div class="avatar-preview">🎨</div>
+              <p>Creative</p>
+            </div>
+            <div class="avatar-option" data-avatar="🌍">
+              <div class="avatar-preview">🌍</div>
+              <p>World</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Color Theme Selection -->
+        <div class="setup-section">
+          <h2>Choose Your Color Theme</h2>
+          <div class="color-grid">
+            <div class="color-option" data-theme="ocean">
+              <div class="color-preview" style="background: linear-gradient(135deg, #E6F4F1, #2C7A7B);"></div>
+              <p>Ocean</p>
+            </div>
+            <div class="color-option" data-theme="sunset">
+              <div class="color-preview" style="background: linear-gradient(135deg, #FFE8CC, #FF6B35);"></div>
+              <p>Sunset</p>
+            </div>
+            <div class="color-option" data-theme="forest">
+              <div class="color-preview" style="background: linear-gradient(135deg, #E8F5E9, #2E7D32);"></div>
+              <p>Forest</p>
+            </div>
+            <div class="color-option" data-theme="lavender">
+              <div class="color-preview" style="background: linear-gradient(135deg, #F3E5F5, #7B1FA2);"></div>
+              <p>Lavender</p>
+            </div>
+            <div class="color-option active" data-theme="mint">
+              <div class="color-preview" style="background: linear-gradient(135deg, #E0F2F1, #00897B);"></div>
+              <p>Mint</p>
+            </div>
+            <div class="color-option" data-theme="coral">
+              <div class="color-preview" style="background: linear-gradient(135deg, #FFEBEE, #E53935);"></div>
+              <p>Coral</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- User ID Input -->
+        <div class="setup-section">
+          <label for="userId">Your ID (optional):</label>
+          <input type="text" id="userId" placeholder="Enter your ID or leave blank" maxlength="50">
+          <p class="help-text">This helps us remember you</p>
+        </div>
+
+        <!-- Start Button -->
+        <button id="startBtn" class="btn btn-primary btn-large">Start Chatting ✨</button>
+      </div>
+    </div>
+
+    <!-- Chat Screen -->
+    <div id="chatScreen" class="screen">
+      <div class="chat-container">
+        <!-- Header -->
+        <div class="chat-header">
+          <div class="header-content">
+            <div class="avatar-display" id="headerAvatar">🤖</div>
+            <div class="header-text">
+              <h1>CareBridge Companion</h1>
+              <p id="statusText">Ready to chat</p>
+            </div>
+          </div>
+          <button id="settingsBtn" class="btn-icon" title="Settings">⚙️</button>
+        </div>
+
+        <!-- Messages -->
+        <div class="messages-container" id="messagesContainer">
+          <div class="message assistant">
+            <div class="avatar">🤖</div>
+            <div class="content">
+              <p>Hi there! 👋 I'm CareBridge Companion. I'm here to listen and support you. How are you doing today?</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input -->
+        <div class="input-container">
+          <div class="input-group">
+            <input 
+              type="text" 
+              id="messageInput" 
+              placeholder="Type your thoughts... (or just chat.)"
+              autocomplete="off"
+            >
+            <button id="sendBtn" class="btn-send" title="Send message">📤</button>
+          </div>
+          <p class="disclaimer">💬 Everything you share here stays private and confidential</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Settings</h2>
+          <button id="closeSettingsBtn" class="btn-close">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Avatar in Settings -->
+          <div class="settings-section">
+            <h3>Change Avatar</h3>
+            <div class="avatar-grid small">
+              <div class="avatar-option" data-avatar="🤖">
+                <div class="avatar-preview">🤖</div>
+              </div>
+              <div class="avatar-option" data-avatar="🧠">
+                <div class="avatar-preview">🧠</div>
+              </div>
+              <div class="avatar-option" data-avatar="⭐">
+                <div class="avatar-preview">⭐</div>
+              </div>
+              <div class="avatar-option" data-avatar="🌟">
+                <div class="avatar-preview">🌟</div>
+              </div>
+              <div class="avatar-option" data-avatar="💚">
+                <div class="avatar-preview">💚</div>
+              </div>
+              <div class="avatar-option" data-avatar="🌈">
+                <div class="avatar-preview">🌈</div>
+              </div>
+              <div class="avatar-option" data-avatar="🎨">
+                <div class="avatar-preview">🎨</div>
+              </div>
+              <div class="avatar-option" data-avatar="🌍">
+                <div class="avatar-preview">🌍</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Theme in Settings -->
+          <div class="settings-section">
+            <h3>Change Theme</h3>
+            <div class="color-grid small">
+              <div class="color-option" data-theme="ocean">
+                <div class="color-preview" style="background: linear-gradient(135deg, #E6F4F1, #2C7A7B);"></div>
+              </div>
+              <div class="color-option" data-theme="sunset">
+                <div class="color-preview" style="background: linear-gradient(135deg, #FFE8CC, #FF6B35);"></div>
+              </div>
+              <div class="color-option" data-theme="forest">
+                <div class="color-preview" style="background: linear-gradient(135deg, #E8F5E9, #2E7D32);"></div>
+              </div>
+              <div class="color-option" data-theme="lavender">
+                <div class="color-preview" style="background: linear-gradient(135deg, #F3E5F5, #7B1FA2);"></div>
+              </div>
+              <div class="color-option active" data-theme="mint">
+                <div class="color-preview" style="background: linear-gradient(135deg, #E0F2F1, #00897B);"></div>
+              </div>
+              <div class="color-option" data-theme="coral">
+                <div class="color-preview" style="background: linear-gradient(135deg, #FFEBEE, #E53935);"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Current Session Info -->
+          <div class="settings-section">
+            <h3>Session Info</h3>
+            <div class="info-box">
+              <p><strong>Your ID:</strong> <span id="settingsUserId">-</span></p>
+              <p><strong>Session ID:</strong> <span id="settingsSessionId">-</span></p>
+              <p><strong>Messages:</strong> <span id="settingsMessageCount">0</span></p>
+            </div>
+          </div>
+
+          <!-- Clear Chat -->
+          <div class="settings-section">
+            <button id="newChatBtn" class="btn btn-secondary">Start New Conversation</button>
+            <p class="help-text">This will start a fresh session</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="loading-indicator">
+      <div class="spinner"></div>
+      <p>Companion is thinking...</p>
+    </div>
+  </div>
+
+  <script src="chat.js"></script>
+  <script src="themes.js"></script>
+</body>
+</html>
