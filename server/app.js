@@ -30,6 +30,7 @@ const { checkCompanionAvailability, logAvailabilityStatus } = require('./middlew
 const healthCheckService = require('./services/healthCheckService');
 const chatRoutes = require('./routes/chatRoutes');
 const userRoutes = require('./routes/userRoutes');
+const staffRoutes = require('./routes/staffRoutes');
 
 // Logger
 const logger = require('./utils/logger');
@@ -170,8 +171,16 @@ app.use('/', chatRoutes);
  */
 app.use('/api/users', userRoutes);
 
+/**
+ * Staff routes - authentication, account management, and role-based access
+ * Example: POST /api/staff/login, POST /api/staff/register, GET /api/staff/profile
+ * See server/routes/staffRoutes.js for complete documentation
+ */
+app.use('/api/staff', staffRoutes);
+
 logger.info('Chat routes enabled - streaming and full history storage active');
-logger.info('User routes enabled - PIN authentication and cross-device sync active');
+logger.info('User routes enabled - PIN/Password authentication and cross-device sync active');
+logger.info('Staff routes enabled - Email/Username authentication and role-based access control active');
 
 /**
  * Briefing routes

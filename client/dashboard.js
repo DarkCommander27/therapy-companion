@@ -6,11 +6,37 @@ const API_BASE = 'http://localhost:3000/api';
 let currentView = 'overview';
 let allConversations = [];
 let allFlaggedConversations = [];
+let staffToken = null;
+
+// ============================================
+// AUTHENTICATION GUARD
+// ============================================
+function checkAuthentication() {
+  staffToken = localStorage.getItem('staffToken');
+  
+  if (!staffToken) {
+    console.warn('No staff token found, redirecting to login');
+    window.location.href = './staff-login.html';
+    return false;
+  }
+  
+  return true;
+}
+
+function handleLogout() {
+  if (confirm('Are you sure you want to sign out?')) {
+    localStorage.removeItem('staffToken');
+    localStorage.removeItem('rememberStaffDevice');
+    window.location.href = './staff-login.html';
+  }
+}
 
 // ============================================
 // INITIALIZATION
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
+  if (!checkAuthentication()) return;
+  
   initializeEventListeners();
   loadDashboardData();
   switchView('overview');
@@ -67,6 +93,12 @@ function initializeEventListeners() {
         hideLoadingOverlay();
       });
     });
+  }
+
+  // Logout button
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', handleLogout);
   }
 }
 

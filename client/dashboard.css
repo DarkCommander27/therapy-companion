@@ -182,9 +182,28 @@ body {
   font-size: 16px;
 }
 
+.btn-logout {
+  padding: 8px 15px;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 15px;
+  transition: background 0.3s;
+}
+
+.btn-logout:hover {
+  background: #c0392b;
+}
+
 .user-info {
   font-size: 14px;
   color: var(--text-light);
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 /* ============================================

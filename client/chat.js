@@ -7,19 +7,44 @@ const API_URL = 'http://localhost:3000';
 let currentSession = null;
 let currentUserId = null;
 let currentPin = null;
+let currentPassword = null;
+let staffToken = null;
 let currentAvatar = '🤖';
 let currentTheme = 'mint';
 let messageCount = 0;
 let isNewUser = false;
+let currentAuthMethod = 'pin'; // 'pin', 'password', or 'staff'
 
 // ============================================
 // DOM ELEMENTS
 // ============================================
 const loginScreen = document.getElementById('loginScreen');
+
+// PIN Login Elements
+const pinLoginForm = document.getElementById('pinLoginForm');
 const userIdInput = document.getElementById('userIdInput');
 const pinInput = document.getElementById('pinInput');
 const loginBtn = document.getElementById('loginBtn');
 const loginStatus = document.getElementById('loginStatus');
+
+// Password Login Elements
+const passwordLoginForm = document.getElementById('passwordLoginForm');
+const userIdPassword = document.getElementById('userIdPassword');
+const passwordInput = document.getElementById('passwordInput');
+const passwordLoginBtn = document.getElementById('passwordLoginBtn');
+const loginStatusPassword = document.getElementById('loginStatusPassword');
+const passwordStrength = document.getElementById('passwordStrength');
+
+// Staff Login Elements
+const staffLoginForm = document.getElementById('staffLoginForm');
+const staffEmailUsername = document.getElementById('staffEmailUsername');
+const staffPassword = document.getElementById('staffPassword');
+const rememberDevice = document.getElementById('rememberDevice');
+const staffLoginBtn = document.getElementById('staffLoginBtn');
+const loginStatusStaff = document.getElementById('loginStatusStaff');
+
+// Auth Method Selector
+const authMethodBtns = document.querySelectorAll('.auth-method-btn');
 
 const setupScreen = document.getElementById('setupScreen');
 const chatScreen = document.getElementById('chatScreen');
@@ -38,19 +63,39 @@ const headerAvatar = document.getElementById('headerAvatar');
 // ============================================
 // INITIALIZATION
 // ============================================
-// INITIALIZATION
-// ============================================
 document.addEventListener('DOMContentLoaded', () => {
   setupEventListeners();
   checkApiConnection();
 });
 
 function setupEventListeners() {
-  // Login screen
-  loginBtn.addEventListener('click', handleLogin);
+  // Auth method selector
+  authMethodBtns.forEach(btn => {
+    btn.addEventListener('click', () => switchAuthMethod(btn.dataset.method));
+  });
+
+  // PIN Login screen
+  loginBtn.addEventListener('click', handlePINLogin);
   pinInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
-      handleLogin();
+      handlePINLogin();
+    }
+  });
+
+  // Password Login screen
+  passwordLoginBtn.addEventListener('click', handlePasswordLogin);
+  passwordInput.addEventListener('input', updatePasswordStrength);
+  passwordInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      handlePasswordLogin();
+    }
+  });
+
+  // Staff Login screen
+  staffLoginBtn.addEventListener('click', handleStaffLogin);
+  staffPassword.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      handleStaffLogin();
     }
   });
 
@@ -92,23 +137,57 @@ function setupEventListeners() {
 // ============================================
 // LOGIN FUNCTION
 // ============================================
-async function handleLogin() {
+// ============================================
+// LOGIN METHODS
+// ============================================
+
+function switchAuthMethod(method) {
+  currentAuthMethod = method;
+  
+  // Update button states
+  authMethodBtns.forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.method === method);
+  });
+  
+  // Hide all forms
+  pinLoginForm.style.display = 'none';
+  passwordLoginForm.style.display = 'none';
+  staffLoginForm.style.display = 'none';
+  
+  // Show selected form
+  switch(method) {
+    case 'pin':
+      pinLoginForm.style.display = 'flex';
+      break;
+    case 'password':
+      passwordLoginForm.style.display = 'flex';
+      break;
+    case 'staff':
+      staffLoginForm.style.display = 'flex';
+      break;
+  }
+}
+
+/**
+ * PIN Login Handler
+ */
+async function handlePINLogin() {
   const userId = userIdInput.value.trim();
   const pin = pinInput.value.trim();
 
   if (!userId || !pin || pin.length !== 4) {
-    showLoginStatus('Please enter valid User ID and 4-digit PIN', 'error');
+    showLoginStatus('Please enter valid User ID and 4-digit PIN', 'error', 'pin');
     return;
   }
 
   if (!/^\d{4}$/.test(pin)) {
-    showLoginStatus('PIN must be 4 digits', 'error');
+    showLoginStatus('PIN must be 4 digits', 'error', 'pin');
     return;
   }
 
   try {
     loginBtn.disabled = true;
-    showLoginStatus('Authenticating...', 'loading');
+    showLoginStatus('Authenticating...', 'loading', 'pin');
 
     const response = await fetch(`${API_URL}/api/users/login`, {
       method: 'POST',
@@ -124,7 +203,7 @@ async function handleLogin() {
     const data = await response.json();
 
     if (!response.ok) {
-      showLoginStatus(data.error || 'Login failed', 'error');
+      showLoginStatus(data.error || 'Login failed', 'error', 'pin');
       loginBtn.disabled = false;
       return;
     }
@@ -144,7 +223,7 @@ async function handleLogin() {
     // Switch to setup or chat screen
     if (isNewUser) {
       switchScreen(loginScreen, setupScreen);
-      showLoginStatus('');
+      showLoginStatus('', '', 'pin');
     } else {
       // For returning users, skip setup and go straight to chat
       setupDefaultSelections();
@@ -153,15 +232,179 @@ async function handleLogin() {
     }
 
   } catch (error) {
-    console.error('Login error:', error);
-    showLoginStatus(`Connection error: ${error.message}`, 'error');
+    console.error('PIN Login error:', error);
+    showLoginStatus(`Connection error: ${error.message}`, 'error', 'pin');
     loginBtn.disabled = false;
   }
 }
 
-function showLoginStatus(message, type = '') {
-  loginStatus.textContent = message;
-  loginStatus.className = 'status-message ' + (type ? `status-${type}` : '');
+/**
+ * Password Login Handler
+ */
+async function handlePasswordLogin() {
+  const userId = userIdPassword.value.trim();
+  const password = passwordInput.value.trim();
+
+  if (!userId || !password) {
+    showLoginStatus('Please enter your User ID and password', 'error', 'password');
+    return;
+  }
+
+  if (password.length < 6) {
+    showLoginStatus('Password must be at least 6 characters', 'error', 'password');
+    return;
+  }
+
+  try {
+    passwordLoginBtn.disabled = true;
+    showLoginStatus('Authenticating...', 'loading', 'password');
+
+    const response = await fetch(`${API_URL}/api/users/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId,
+        password,
+        deviceId: `device-${Date.now()}`,
+        deviceName: navigator.userAgent.includes('Mobile') ? 'Mobile Device' : 'Desktop'
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      showLoginStatus(data.error || 'Login failed', 'error', 'password');
+      passwordLoginBtn.disabled = false;
+      return;
+    }
+
+    // Store user info
+    currentUserId = userId;
+    currentPassword = password;
+    isNewUser = data.isNewUser;
+
+    // Load user settings if available
+    if (!isNewUser && data.avatar && data.theme) {
+      currentAvatar = data.avatar;
+      currentTheme = data.theme;
+      applyTheme();
+    }
+
+    // Switch to setup or chat screen
+    if (isNewUser) {
+      switchScreen(loginScreen, setupScreen);
+      showLoginStatus('', '', 'password');
+    } else {
+      setupDefaultSelections();
+      switchScreen(loginScreen, chatScreen);
+      await createSession();
+    }
+
+  } catch (error) {
+    console.error('Password Login error:', error);
+    showLoginStatus(`Connection error: ${error.message}`, 'error', 'password');
+    passwordLoginBtn.disabled = false;
+  }
+}
+
+/**
+ * Staff Login Handler
+ */
+async function handleStaffLogin() {
+  const emailOrUsername = staffEmailUsername.value.trim();
+  const password = staffPassword.value.trim();
+
+  if (!emailOrUsername || !password) {
+    showLoginStatus('Please enter email/username and password', 'error', 'staff');
+    return;
+  }
+
+  try {
+    staffLoginBtn.disabled = true;
+    showLoginStatus('Authenticating...', 'loading', 'staff');
+
+    const loginBody = {
+      password,
+      deviceId: `device-${Date.now()}`,
+      deviceName: navigator.userAgent.includes('Mobile') ? 'Mobile Device' : 'Desktop'
+    };
+
+    // Check if input is email or username
+    if (emailOrUsername.includes('@')) {
+      loginBody.email = emailOrUsername;
+    } else {
+      loginBody.username = emailOrUsername;
+    }
+
+    const response = await fetch(`${API_URL}/api/staff/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(loginBody)
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      showLoginStatus(data.error || 'Staff login failed', 'error', 'staff');
+      staffLoginBtn.disabled = false;
+      return;
+    }
+
+    // Store staff token
+    staffToken = data.token;
+    localStorage.setItem('staffToken', staffToken);
+
+    if (rememberDevice.checked) {
+      localStorage.setItem('rememberStaffDevice', 'true');
+    }
+
+    // Redirect to staff dashboard
+    showLoginStatus('Redirecting to dashboard...', 'success', 'staff');
+    setTimeout(() => {
+      window.location.href = './dashboard.html';
+    }, 1500);
+
+  } catch (error) {
+    console.error('Staff Login error:', error);
+    showLoginStatus(`Connection error: ${error.message}`, 'error', 'staff');
+    staffLoginBtn.disabled = false;
+  }
+}
+
+/**
+ * Update password strength indicator
+ */
+function updatePasswordStrength() {
+  const password = passwordInput.value;
+  
+  if (!password) {
+    passwordStrength.innerHTML = '';
+    passwordStrength.className = 'password-strength empty';
+    return;
+  }
+
+  let strength = 'weak';
+  if (password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password)) {
+    strength = 'good';
+  } else if (password.length >= 8 || (/[A-Z]/.test(password) && /[0-9]/.test(password))) {
+    strength = 'fair';
+  }
+
+  passwordStrength.innerHTML = `<div class="password-strength-bar ${strength}"></div>`;
+  passwordStrength.className = 'password-strength';
+}
+
+function showLoginStatus(message, type = '', method = 'pin') {
+  const statusElement = method === 'pin' ? 
+    loginStatus : 
+    method === 'password' ? 
+      loginStatusPassword : 
+      loginStatusStaff;
+
+  if (statusElement) {
+    statusElement.textContent = message;
+    statusElement.className = 'status-message ' + (type ? `status-${type}` : '');
+  }
 }
 
 function switchScreen(fromScreen, toScreen) {
@@ -218,17 +461,27 @@ function saveSettings() {
 }
 
 async function saveSettingsToDatabase() {
-  if (!currentUserId || !currentPin) return;
+  if (!currentUserId) return;
 
   try {
+    const body = {
+      avatar: currentAvatar,
+      theme: currentTheme
+    };
+
+    // Add authentication based on current method
+    if (currentPin) {
+      body.pin = currentPin;
+    } else if (currentPassword) {
+      body.password = currentPassword;
+    } else {
+      return; // No auth method available
+    }
+
     const response = await fetch(`${API_URL}/api/users/${currentUserId}/settings`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        pin: currentPin,
-        avatar: currentAvatar,
-        theme: currentTheme
-      })
+      body: JSON.stringify(body)
     });
 
     if (response.ok) {

@@ -16,7 +16,24 @@
           <p>Multi-Device Secure Access</p>
         </div>
 
-        <div class="login-form">
+        <!-- Auth Method Selector -->
+        <div class="auth-method-selector">
+          <button class="auth-method-btn active" data-method="pin">
+            <span class="method-icon">🔐</span>
+            <span class="method-text">PIN Login</span>
+          </button>
+          <button class="auth-method-btn" data-method="password">
+            <span class="method-icon">🔑</span>
+            <span class="method-text">Password Login</span>
+          </button>
+          <button class="auth-method-btn" data-method="staff">
+            <span class="method-icon">👔</span>
+            <span class="method-text">Staff Login</span>
+          </button>
+        </div>
+
+        <!-- PIN Login Form -->
+        <div class="login-form active" id="pinLoginForm">
           <div class="form-group">
             <label for="userIdInput">User ID:</label>
             <input type="text" id="userIdInput" placeholder="Enter your user ID" />
@@ -37,6 +54,67 @@
             <p>
               💡 New User? Create a PIN (4 digits) when you first login.
               <br>Your PIN lets you access your account from any device.
+            </p>
+          </div>
+        </div>
+
+        <!-- Password Login Form -->
+        <div class="login-form" id="passwordLoginForm" style="display: none;">
+          <div class="form-group">
+            <label for="userIdPassword">User ID:</label>
+            <input type="text" id="userIdPassword" placeholder="Enter your user ID" />
+          </div>
+
+          <div class="form-group">
+            <label for="passwordInput">Password:</label>
+            <input type="password" id="passwordInput" placeholder="Enter your password" />
+          </div>
+
+          <div class="password-strength" id="passwordStrength"></div>
+
+          <div id="loginStatusPassword" class="status-message"></div>
+
+          <button id="passwordLoginBtn" class="btn-primary" style="width: 100%; padding: 12px; margin-top: 20px;">
+            Login
+          </button>
+
+          <div class="login-help">
+            <p>
+              💡 Password must be at least 6 characters.
+              <br>Use a strong password to protect your account.
+            </p>
+          </div>
+        </div>
+
+        <!-- Staff Login Form -->
+        <div class="login-form" id="staffLoginForm" style="display: none;">
+          <div class="form-group">
+            <label for="staffEmailUsername">Email or Username:</label>
+            <input type="text" id="staffEmailUsername" placeholder="Enter email or username" />
+          </div>
+
+          <div class="form-group">
+            <label for="staffPassword">Password:</label>
+            <input type="password" id="staffPassword" placeholder="Enter your password" />
+          </div>
+
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="rememberDevice" />
+              Remember this device
+            </label>
+          </div>
+
+          <div id="loginStatusStaff" class="status-message"></div>
+
+          <button id="staffLoginBtn" class="btn-primary" style="width: 100%; padding: 12px; margin-top: 20px;">
+            Staff Login
+          </button>
+
+          <div class="login-help">
+            <p>
+              👔 Staff members use their email or username to login.
+              <br>This redirects to the staff dashboard with role-based access.
             </p>
           </div>
         </div>

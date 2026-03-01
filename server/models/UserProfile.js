@@ -1,9 +1,11 @@
 /**
  * UserProfile Model
  * Stores user settings and preferences across devices
+ * Supports both PIN and password authentication
  */
 
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const userProfileSchema = new mongoose.Schema({
   userId: {
@@ -13,9 +15,16 @@ const userProfileSchema = new mongoose.Schema({
     index: true
   },
   
-  pin: {
-    type: String,
-    required: true
+  // Authentication methods
+  authentications: {
+    pin: {
+      enabled: { type: Boolean, default: false },
+      value: String // 4-digit PIN
+    },
+    password: {
+      enabled: { type: Boolean, default: false },
+      hash: String // bcrypt hash
+    }
   },
   
   avatar: {
@@ -62,5 +71,26 @@ const userProfileSchema = new mongoose.Schema({
     default: Date.now
   }
 });
+
+// Hash password before saving
+userProfileSchema.pre('save', async function(next) {
+  if (this.authentications.password.hash && !this.authentications.password.hash.startsWith('$2')) {
+    try {
+      const salt = await bcrypt.genSalt(10);
+      this.authentications.password.hash = await bcrypt.hash(this.authentications.password.hash, salt);
+    } catch (error) {
+      return next(error);
+    }
+  }
+  next();
+});
+
+// Method to verify password
+userProfileSchema.methods.verifyPassword = async function(password) {
+  if (!this.authentications.password.enabled || !this.authentications.password.hash) {
+    return false;
+  }
+  return await bcrypt.compare(password, this.authentications.password.hash);
+};
 
 module.exports = mongoose.model('UserProfile', userProfileSchema);
