@@ -29,6 +29,7 @@ const { checkCompanionAvailability, logAvailabilityStatus } = require('./middlew
 // const AutomatedBriefingScheduler = require('./services/automatedBriefingScheduler'); // TODO: Re-enable after CompanionProfile model created
 const healthCheckService = require('./services/healthCheckService');
 const chatRoutes = require('./routes/chatRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 // Logger
 const logger = require('./utils/logger');
@@ -122,8 +123,13 @@ async function connectDatabase() {
 // 5. HEALTH CHECK ENDPOINT
 // ========================================
 
+// Simple health endpoint
+app.get('/health', asyncHandler(async (req, res) => {
+  res.json({ status: 'ok' });
+}));
+
 if (process.env.ENABLE_HEALTH_CHECK === 'true') {
-  app.get('/health', asyncHandler(async (req, res) => {
+  app.get('/health/detailed', asyncHandler(async (req, res) => {
     const health = await healthCheckService.getSystemHealth();
     const statusCode = health.status === 'healthy' ? 200 : 503;
     res.status(statusCode).json(health);
@@ -134,7 +140,7 @@ if (process.env.ENABLE_HEALTH_CHECK === 'true') {
     res.json(metrics);
   }));
 
-  logger.info('Health check endpoints enabled');
+  logger.info('Detailed health check endpoints enabled');
 }
 
 // ========================================
@@ -157,7 +163,15 @@ app.post('/api/auth/login', asyncHandler(async (req, res) => {
  */
 app.use('/', chatRoutes);
 
+/**
+ * User routes - authentication & cross-device sync
+ * Example: POST /api/users/login, PUT /api/users/:userId/settings
+ * See server/routes/userRoutes.js for complete documentation
+ */
+app.use('/api/users', userRoutes);
+
 logger.info('Chat routes enabled - streaming and full history storage active');
+logger.info('User routes enabled - PIN authentication and cross-device sync active');
 
 /**
  * Briefing routes

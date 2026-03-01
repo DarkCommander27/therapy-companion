@@ -6,13 +6,21 @@ const API_URL = 'http://localhost:3000';
 
 let currentSession = null;
 let currentUserId = null;
+let currentPin = null;
 let currentAvatar = '🤖';
 let currentTheme = 'mint';
 let messageCount = 0;
+let isNewUser = false;
 
 // ============================================
 // DOM ELEMENTS
 // ============================================
+const loginScreen = document.getElementById('loginScreen');
+const userIdInput = document.getElementById('userIdInput');
+const pinInput = document.getElementById('pinInput');
+const loginBtn = document.getElementById('loginBtn');
+const loginStatus = document.getElementById('loginStatus');
+
 const setupScreen = document.getElementById('setupScreen');
 const chatScreen = document.getElementById('chatScreen');
 const startBtn = document.getElementById('startBtn');
@@ -30,13 +38,22 @@ const headerAvatar = document.getElementById('headerAvatar');
 // ============================================
 // INITIALIZATION
 // ============================================
+// INITIALIZATION
+// ============================================
 document.addEventListener('DOMContentLoaded', () => {
-  loadSettings();
   setupEventListeners();
   checkApiConnection();
 });
 
 function setupEventListeners() {
+  // Login screen
+  loginBtn.addEventListener('click', handleLogin);
+  pinInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      handleLogin();
+    }
+  });
+
   // Setup screen
   startBtn.addEventListener('click', startChat);
   
@@ -73,6 +90,95 @@ function setupEventListeners() {
 }
 
 // ============================================
+// LOGIN FUNCTION
+// ============================================
+async function handleLogin() {
+  const userId = userIdInput.value.trim();
+  const pin = pinInput.value.trim();
+
+  if (!userId || !pin || pin.length !== 4) {
+    showLoginStatus('Please enter valid User ID and 4-digit PIN', 'error');
+    return;
+  }
+
+  if (!/^\d{4}$/.test(pin)) {
+    showLoginStatus('PIN must be 4 digits', 'error');
+    return;
+  }
+
+  try {
+    loginBtn.disabled = true;
+    showLoginStatus('Authenticating...', 'loading');
+
+    const response = await fetch(`${API_URL}/api/users/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId,
+        pin,
+        deviceId: `device-${Date.now()}`,
+        deviceName: navigator.userAgent.includes('Mobile') ? 'Mobile Device' : 'Desktop'
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      showLoginStatus(data.error || 'Login failed', 'error');
+      loginBtn.disabled = false;
+      return;
+    }
+
+    // Store user info
+    currentUserId = userId;
+    currentPin = pin;
+    isNewUser = data.isNewUser;
+
+    // Load user settings if available
+    if (!isNewUser && data.avatar && data.theme) {
+      currentAvatar = data.avatar;
+      currentTheme = data.theme;
+      applyTheme();
+    }
+
+    // Switch to setup or chat screen
+    if (isNewUser) {
+      switchScreen(loginScreen, setupScreen);
+      showLoginStatus('');
+    } else {
+      // For returning users, skip setup and go straight to chat
+      setupDefaultSelections();
+      switchScreen(loginScreen, chatScreen);
+      await createSession();
+    }
+
+  } catch (error) {
+    console.error('Login error:', error);
+    showLoginStatus(`Connection error: ${error.message}`, 'error');
+    loginBtn.disabled = false;
+  }
+}
+
+function showLoginStatus(message, type = '') {
+  loginStatus.textContent = message;
+  loginStatus.className = 'status-message ' + (type ? `status-${type}` : '');
+}
+
+function switchScreen(fromScreen, toScreen) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  toScreen.classList.add('active');
+}
+
+function setupDefaultSelections() {
+  // Set default avatar and theme selections
+  document.querySelectorAll('[data-avatar]').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('[data-theme]').forEach(el => el.classList.remove('active'));
+  
+  document.querySelector(`[data-avatar="${currentAvatar}"]`)?.classList.add('active');
+  document.querySelector(`[data-theme="${currentTheme}"]`)?.classList.add('active');
+}
+
+// ============================================
 // SETUP FUNCTIONS
 // ============================================
 function selectAvatar(element) {
@@ -105,24 +211,52 @@ function applyTheme() {
 }
 
 function saveSettings() {
+  // Still save to localStorage for quick access
   localStorage.setItem('carebridge-avatar', currentAvatar);
   localStorage.setItem('carebridge-theme', currentTheme);
   localStorage.setItem('carebridge-userId', currentUserId);
 }
 
+async function saveSettingsToDatabase() {
+  if (!currentUserId || !currentPin) return;
+
+  try {
+    const response = await fetch(`${API_URL}/api/users/${currentUserId}/settings`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pin: currentPin,
+        avatar: currentAvatar,
+        theme: currentTheme
+      })
+    });
+
+    if (response.ok) {
+      console.log('✓ Settings synced to database');
+    } else {
+      console.warn('⚠ Settings not synced, but chat continues');
+    }
+  } catch (error) {
+    console.warn('Settings sync failed (non-blocking):', error);
+  }
+}
+
 function loadSettings() {
+  // Load from localStorage as fallback
   const savedAvatar = localStorage.getItem('carebridge-avatar');
   const savedTheme = localStorage.getItem('carebridge-theme');
   const savedUserId = localStorage.getItem('carebridge-userId');
 
-  if (savedAvatar) {
+  if (savedAvatar && !currentAvatar) {
     currentAvatar = savedAvatar;
-    document.querySelector(`[data-avatar="${savedAvatar}"]`)?.classList.add('active');
-  } else {
-    document.querySelector('[data-avatar="🤖"]')?.classList.add('active');
   }
-
-  if (savedTheme) {
+  if (savedTheme && !currentTheme) {
+    currentTheme = savedTheme;
+  }
+  if (savedUserId && !currentUserId) {
+    currentUserId = savedUserId;
+  }
+}  if (savedTheme) {
     currentTheme = savedTheme;
     selectThemeByName(savedTheme);
   } else {
@@ -157,23 +291,15 @@ async function checkApiConnection() {
 }
 
 async function startChat() {
-  const userIdInput = document.getElementById('userId').value.trim();
-  
-  if (!userIdInput) {
-    currentUserId = `user-${Date.now()}`;
-  } else {
-    currentUserId = userIdInput;
-  }
-
-  saveSettings();
+  // Save settings to database
+  await saveSettingsToDatabase();
 
   // Check API before proceeding
   const isConnected = await checkApiConnection();
   if (!isConnected) return;
 
   // Switch screens
-  setupScreen.classList.remove('active');
-  chatScreen.classList.add('active');
+  switchScreen(setupScreen, chatScreen);
 
   // Update header
   headerAvatar.textContent = currentAvatar;
@@ -228,8 +354,8 @@ async function sendMessage() {
   messageCount++;
 
   try {
-    // Check if client supports streaming
-    const supportsStreaming = process.env.NODE_ENV !== 'production';
+    // Always attempt streaming in browser
+    const supportsStreaming = true;
 
     const fetchOptions = {
       method: 'POST',
@@ -255,19 +381,22 @@ async function sendMessage() {
       throw new Error(error.error || 'Failed to send message');
     }
 
-    // Handle streaming response
-    if (response.headers.get('content-type')?.includes('text/event-stream')) {
-      await handleStreamingResponse(response);
-    } else {
-      // Fallback to non-streaming
-      const data = await response.json();
-      handleNonStreamingResponse(data);
+    // Always try streaming first (check if body is readable)
+    if (response.body) {
+      try {
+        await handleStreamingResponse(response);
+      } catch (error) {
+        console.warn('Streaming failed, attempting JSON fallback:', error);
+        // If streaming fails, we can't retry since body is consumed
+        // But the error will be caught below
+      }
     }
 
     statusText.textContent = 'Ready to chat';
     messageCount++;
   } catch (error) {
     console.error('Error sending message:', error);
+    showNotification(`Error: ${error.message}`);
     addMessageToUI('assistant', `Sorry, I encountered an error: ${error.message}. Please try again.`);
     statusText.textContent = 'Error occurred';
   } finally {
@@ -281,45 +410,78 @@ async function sendMessage() {
 async function handleStreamingResponse(response) {
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
-  let assistantMessage = '';
+  let fullResponse = '';
   let messageElement = null;
 
   try {
+    let buffer = '';
+
     while (true) {
       const { done, value } = await reader.read();
-      if (done) break;
+      if (done) {
+        // Process any remaining buffer
+        if (buffer) {
+          const lines = buffer.split('\n').filter(l => l.trim());
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const json = JSON.parse(line.slice(6));
+                if (json.chunk) {
+                  fullResponse += json.chunk;
+                }
+              } catch (e) {
+                // Skip malformed JSON
+              }
+            }
+          }
+        }
+        break;
+      }
 
-      const chunk = decoder.decode(value);
-      const lines = chunk.split('\n').filter(line => line.startsWith('data: '));
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || ''; // Keep incomplete line in buffer
 
       for (const line of lines) {
-        try {
-          const json = JSON.parse(line.slice(6));
-          
-          if (json.chunk) {
-            assistantMessage += json.chunk;
+        if (!line.trim()) continue;
+        
+        if (line.startsWith('data: ')) {
+          try {
+            const json = JSON.parse(line.slice(6));
             
-            // Create or update message element
-            if (!messageElement) {
-              messageElement = addMessageToUI('assistant', assistantMessage);
-            } else {
-              messageElement.querySelector('.content p').textContent = assistantMessage;
+            if (json.chunk) {
+              fullResponse += json.chunk;
+              
+              // Create or update message element
+              if (!messageElement) {
+                messageElement = addMessageToUI('assistant', fullResponse);
+              } else {
+                const contentP = messageElement.querySelector('.content p');
+                if (contentP) contentP.textContent = fullResponse;
+              }
+
+              // Auto-scroll
+              messagesContainer.scrollTop = messagesContainer.scrollHeight;
             }
 
-            // Auto-scroll
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            if (json.isDone) {
+              statusText.textContent = 'Message received';
+            }
+          } catch (e) {
+            // Invalid JSON line, skip
           }
-
-          if (json.isDone) {
-            statusText.textContent = 'Message received';
-          }
-        } catch (e) {
-          // Invalid JSON line, skip
         }
       }
     }
+
+    // If no message was created, something went wrong
+    if (!messageElement && fullResponse === '') {
+      throw new Error('No response received from server');
+    }
+
   } catch (error) {
-    console.error('Stream error:', error);
+    console.error('Streaming error:', error);
+    throw error;
   }
 }
 

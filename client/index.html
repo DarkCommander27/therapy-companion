@@ -8,12 +8,47 @@
 </head>
 <body>
   <div class="app">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="screen active">
+      <div class="login-container">
+        <div class="login-header">
+          <h1>CareBridge Companion 🤖</h1>
+          <p>Multi-Device Secure Access</p>
+        </div>
+
+        <div class="login-form">
+          <div class="form-group">
+            <label for="userIdInput">User ID:</label>
+            <input type="text" id="userIdInput" placeholder="Enter your user ID" />
+          </div>
+
+          <div class="form-group">
+            <label for="pinInput">PIN (4-digit):</label>
+            <input type="password" id="pinInput" placeholder="Enter your PIN" maxlength="4" />
+          </div>
+
+          <div id="loginStatus" class="status-message"></div>
+
+          <button id="loginBtn" class="btn-primary" style="width: 100%; padding: 12px; margin-top: 20px;">
+            Login / Register
+          </button>
+
+          <div class="login-help">
+            <p>
+              💡 New User? Create a PIN (4 digits) when you first login.
+              <br>Your PIN lets you access your account from any device.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Setup Screen -->
-    <div id="setupScreen" class="screen active">
+    <div id="setupScreen" class="screen">
       <div class="setup-container">
         <div class="setup-header">
-          <h1>Welcome to CareBridge Companion 🤖</h1>
-          <p>Let's personalize your experience</p>
+          <h1>Let's personalize your experience</h1>
+          <p>Choose your avatar and color theme</p>
         </div>
 
         <!-- Avatar Selection -->
@@ -84,13 +119,6 @@
               <p>Coral</p>
             </div>
           </div>
-        </div>
-
-        <!-- User ID Input -->
-        <div class="setup-section">
-          <label for="userId">Your ID (optional):</label>
-          <input type="text" id="userId" placeholder="Enter your ID or leave blank" maxlength="50">
-          <p class="help-text">This helps us remember you</p>
         </div>
 
         <!-- Start Button -->
