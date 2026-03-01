@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      /* S5: Gentle Teal Blue - Professional, calming, and trust-inspiring for healthcare */
+      --bg-color: #E6F4F1; 
+      /* S1: Deep Teal/Slate - High contrast, legible */
+      --text-color: #102A2E; 
+      --accent-color: #2C7A7B;
+      --card-bg: #FFFFFF;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      min-height: 100%;
+    }
+
+    /* === Hero 区域 === */
+    .hero {
+      position: absolute; top: 0; left: 0; width: 100%; z-index: 0;
+      user-select: none; line-height: 0;
+    }
+    .hero-img { width: 100%; height: 100%; object-fit: cover; margin:0 }
+    .hero-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      /* Gradient matches the page background color */
+      background: linear-gradient(180deg, rgba(230, 244, 241, 0) 50%, var(--bg-color) 100%);
+    }
+
+    /* === Hero 高度断点 === */
+    .hero { height: 148px; }
+    @media (min-width: 360px) { .hero { height: 164px; } }
+    @media (min-width: 401px) { .hero { height: 182px; } }
+    @media (min-width: 450px) { .hero { height: 280px; } }
+
+    /* === 正文容器 === */
+    .container {
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column; gap: 20px;
+    }
+    /* === Padding 断点 === */
+    .container { padding: 148px 18px 36px; }
+    @media (min-width: 360px) { .container { padding: 164px 24px 78px; } }
+    @media (min-width: 401px) { .container { padding: 182px 30px 78px; } }
+    @media (min-width: 450px) {
+      .container {
+        padding: 280px 48px 78px;
+        width: 680px; margin: 0 auto;
+        border-radius: 8px;
+        /* PC layout visual enhancement */
+        background-color: rgba(255, 255, 255, 0.5); 
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      }
+    }
+
+    /* === 排版细节 === */
+    h1 { 
+      text-align: center; font-size: 27px; line-height: 1.3; margin-bottom: 10px; 
+      color: #0E3F45; font-weight: 800;
+    }
+    h2 {
+      font-size: 20px; margin-top: 15px; padding-bottom: 8px;
+      border-bottom: 2px solid var(--accent-color);
+      color: #1A535C;
+    }
+    h3 {
+      font-size: 18px; margin-top: 10px; font-weight: 600;
+      color: #2C7A7B;
+    }
+    p { font-size: 16px; word-wrap: break-word; margin-bottom: 8px; }
+    ul { list-style: none; padding-left: 0; }
+    li { position: relative; padding-left: 24px; margin-bottom: 8px; font-size: 16px; }
+    li::before {
+      content: "•"; color: var(--accent-color); font-weight: bold;
+      position: absolute; left: 6px; font-size: 18px;
+    }
+
+    strong { font-weight: 700; color: #0E3F45; }
+
+    /* Card-like sections for better readability */
+    .section-card {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      display: flex; flex-direction: column; gap: 10px;
+    }
+
+    .callout {
+      background-color: #F0F9FA;
+      border-left: 4px solid var(--accent-color);
+      padding: 15px;
+      border-radius: 4px;
+      font-style: italic;
+    }
+
+    /* Table styling for simple table */
+    .simple-table {
+      width: 100%; border-collapse: collapse; margin-top: 10px;
+    }
+    .simple-table th, .simple-table td {
+      text-align: left; padding: 12px;
+      border-bottom: 1px solid #eee;
+    }
+    .simple-table th { color: var(--accent-color); }
+    .simple-table tr:last-child td { border-bottom: none; }
+
+    img { display: block; width: 100%; border-radius: 8px; margin: 10px 0; }
+
+    @media (min-width: 450px) {
+      h1 { font-size: 36px; }
+      p, li, .simple-table td { font-size: 18px; }
+      h2 { font-size: 24px; }
+      h3 { font-size: 20px; }
+    }
+
+    /* === 底部 Logo === */
+    .export-logo { display: flex; justify-content: center; margin-top: 40px; opacity: 0.6; }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <img src="https://img-volc.jianpian.info/super/overseas/poster/1000/1772373288246_1000_ONmkL.jpeg" class="hero-img" data-image-id="b49542de-6739-44a0-a1dd-52e0bb4cf3c4" alt="Hero Background">
+    <div class="hero-overlay"></div>
+  </div>
+
+  <main class="container detail">
+    <h1>CareBridge Companion<br><span style="font-size: 0.7em; font-weight: normal; color: #555;">📋 A Simple Guide for Our Team</span></h1>
+
+    <div class="section-card">
+      <h2>🤖 What Is CareBridge Companion?</h2>
+      <p>CareBridge Companion is a supportive AI chatbot tool that helps young people in our care talk about their feelings and concerns <strong>24/7</strong>, in a safe and private space. It's like having a caring listener available anytime—before bed, after a difficult conversation, or whenever a youth needs to talk.</p>
+      <p>This tool is designed for <strong>all youth</strong>, regardless of their background, immigration status, or life experience. Whether a young person is new to the country, learning English, or carrying experiences that are unique to their migration journey, this system is here to support them with respect and understanding.</p>
+      <p>The system then helps our care team by:</p>
+      <ul>
+        <li>📝 Creating short summaries of what youth are experiencing</li>
+        <li>🚨 Alerting us to safety concerns that need immediate attention</li>
+        <li>🤝 Helping us plan better support and follow-ups</li>
+      </ul>
+    </div>
+
+    <div class="section-card">
+      <h2>👥 Who Uses CareBridge Companion?</h2>
+
+      <h3>👶 For Youth</h3>
+      <ul>
+        <li>Private, judgment-free space to share feelings (in or out of their first language)</li>
+        <li>Can talk anytime (during available hours set by the facility)</li>
+        <li>Messages stay between them and the companion—not shared with staff</li>
+        <li>Safe space to express experiences, including immigration, cultural adjustment, or family separation</li>
+        <li>Support that respects their unique background and identity</li>
+      </ul>
+
+      <h3>👩‍⚕️ For Direct Care Staff</h3>
+      <ul>
+        <li>Daily summaries help you understand what youth are experiencing—including cultural adjustment challenges, family separation concerns, or immigration-related stress</li>
+        <li>Safety alerts notify you if a youth seems to be in distress</li>
+        <li>Helping you prepare for check-ins and conversations with cultural awareness</li>
+        <li>No extra paperwork—the system creates the documentation</li>
+        <li>Information that helps you offer more compassionate, culturally informed care</li>
+      </ul>
+
+      <h3>🧠 For Therapists & Counselors</h3>
+      <ul>
+        <li>Briefings show mood trends and themes from the week</li>
+        <li>Helps you prepare for therapy sessions</li>
+        <li>Alerts indicate when a youth may need extra support</li>
+        <li>Saves time on note-taking</li>
+      </ul>
+
+      <h3>🏢 For Facility Leadership</h3>
+      <ul>
+        <li>Overall picture of youth wellbeing and safety</li>
+        <li>Helps identify patterns and plan better programming</li>
+        <li>Shows how the facility is responding to concerns</li>
+        <li>Supports our commitment to youth safety and care</li>
+      </ul>
+    </div>
+
+    <div class="section-card">
+      <h2>⚙️ How Does It Work?</h2>
+
+      <h3>Step 1: Youth Chat with the Companion 💬</h3>
+      <p>A young person opens the app and talks to the companion—like texting a caring friend. They can share whatever is on their mind.</p>
+
+      <h3>Step 2: The System Listens & Learns 👂</h3>
+      <p>The companion:</p>
+      <ul>
+        <li>Listens carefully to what's said</li>
+        <li>Identifies the youth's mood and concerns</li>
+        <li>Watches for safety red flags (like talk of self-harm or abuse)</li>
+      </ul>
+
+      <h3>Step 3: Staff Get Alerts & Summaries 📲</h3>
+      <p>We receive:</p>
+      <ul>
+        <li><strong>Daily briefing</strong>: "What was this youth's mood? What's on their mind?"</li>
+        <li><strong>Safety alert</strong>: "This message suggests they might be at risk—check in now"</li>
+        <li><strong>Weekly summary</strong>: Trends and patterns we should know about</li>
+      </ul>
+
+      <h3>Step 4: We Respond 🏃‍♂️</h3>
+      <p>Staff check on the youth in person, document what we find, and follow our normal safety procedures. The system helps but doesn't replace us—<strong>we stay in charge of all decisions.</strong></p>
+    </div>
+
+    <div class="section-card">
+      <h2>🚫 What CareBridge Companion Is NOT</h2>
+      <ul>
+        <li>❌ <strong>Not a therapist</strong> — It doesn't diagnose or treat mental health conditions</li>
+        <li>❌ <strong>Not a crisis hotline</strong> — If a youth is in immediate danger, we still follow our emergency procedures</li>
+        <li>❌ <strong>Not staff messaging</strong> — Staff cannot message youth through the system</li>
+        <li>❌ <strong>Not a replacement for human care</strong> — It helps US care better, but you are what matters most</li>
+      </ul>
+    </div>
+
+    <div class="section-card">
+      <h2>🔑 Key Features Explained Simply</h2>
+
+      <h3>⏰ Facility Schedules</h3>
+      <p>The system respects our facility's routine. The companion is available:</p>
+      <ul>
+        <li>During the day and evening activities</li>
+        <li>Before bedtime</li>
+        <li>NOT during lights out (unless the facility chooses otherwise)</li>
+      </ul>
+      <p>This helps youth build healthy habits and prevents overuse.</p>
+
+      <h3>⚠️ Safety Alerts</h3>
+      <p>If a youth mentions something concerning—like thoughts of hurting themselves, concerns about abuse, or being in immediate danger—<strong>we get notified right away.</strong></p>
+      <div class="callout">
+        "⚠️ Sarah's message suggests she might be thinking about self-harm. Check in with her now."
+      </div>
+      <p>Then you follow our normal safety protocols. You're trained for this—the system just helps you notice faster.</p>
+
+      <h3>📊 Briefings (Summaries)</h3>
+      <p>Instead of reading every chat message, you get a short summary:</p>
+      <ul>
+        <li><strong>Mood trend</strong>: "Getting more anxious over the past week"</li>
+        <li><strong>Main themes</strong>: "Worried about family visit" or "Peer conflict with roommate"</li>
+        <li><strong>What to do</strong>: "Check in today; consider a call to mom before the visit"</li>
+      </ul>
+
+      <h3>🔒 Privacy & Confidentiality</h3>
+      <ul>
+        <li>Youth's chats are <strong>private</strong> (conversations are between them and the companion)</li>
+        <li>Staff briefings include the <strong>minimum information</strong> needed to help</li>
+        <li>Identity-sensitive information (like LGBTQ+ disclosures, family separation concerns, or immigration status) is handled with extra care and confidentiality</li>
+        <li>Immigration-related disclosures are protected and kept separate from any official documentation without the youth's consent</li>
+        <li>Everything is encrypted and secure</li>
+      </ul>
+    </div>
+
+    <div class="section-card">
+      <h2>🚨 How to Respond to an Alert</h2>
+
+      <h3>When You Get a Safety Alert:</h3>
+      <p><strong>1. Stay calm 🧘</strong> — The system is helping, not panicking</p>
+      <p><strong>2. Check in with the youth in person 👀</strong> — This is the most important step</p>
+      <ul>
+        <li>Go talk to them face-to-face</li>
+        <li>Use phrases like: "I heard you might be struggling. I'm here to listen."</li>
+        <li>Be patient if language is a barrier—use translation tools if needed</li>
+        <li>Show genuine care and respect for their unique experiences and background</li>
+      </ul>
+      <p><strong>3. Follow our facility's safety procedures 🛡️</strong></p>
+      <ul>
+        <li>Alert your supervisor if needed</li>
+        <li>Escalate to the on-call clinician</li>
+        <li>Document what you observe and do</li>
+      </ul>
+      <p><strong>4. Don't investigate alone 🤝</strong></p>
+      <ul>
+        <li>If there are concerns about abuse or exploitation, involve your safeguarding team</li>
+        <li>Keep it professional and follow mandatory reporting rules</li>
+      </ul>
+      <p><strong>5. Let supervisors know what happened 📢</strong></p>
+      <ul>
+        <li>Keep them updated so the next shift knows</li>
+      </ul>
+    </div>
+
+    <div class="section-card">
+      <h2>📅 Daily Routine</h2>
+
+      <h3>☀️ Morning Briefing (If configured)</h3>
+      <p>Check the overnight briefing summary to understand what youth experienced.</p>
+
+      <h3>🏙️ Throughout the Day</h3>
+      <p>If you get a safety alert, check the youth in person per our procedures.</p>
+
+      <h3>🔁 Shift Handoff</h3>
+      <p>Tell the next shift:</p>
+      <ul>
+        <li>What alerts you responded to</li>
+        <li>What you observed</li>
+        <li>What the youth is working on</li>
+        <li>Any ongoing monitoring needed</li>
+      </ul>
+
+      <h3>📅 Weekly Review (Often with supervisor or clinician)</h3>
+      <p>Review weekly summaries to identify trends and plan better support.</p>
+    </div>
+
+    <div class="section-card">
+      <h2>❓ Frequently Asked Questions</h2>
+      <p><strong>Q: Will the youth know what information we have?</strong><br>
+      A: No. The youth knows they're talking to the companion, but they don't see what summaries we get.</p>
+
+      <p><strong>Q: What if the youth doesn't want to use it?</strong><br>
+      A: Participation is voluntary. We never force a youth to chat. If they prefer not to, that's okay.</p>
+
+      <p><strong>Q: Does this replace my job?</strong><br>
+      A: Absolutely not. You know these youth. The system helps you care better by providing information, but <strong>you make all the decisions.</strong></p>
+
+      <p><strong>Q: What if I think the system is wrong?</strong><br>
+      A: Trust your judgment. If you think an alert is a false alarm, check the youth anyway. Your in-person assessment is what matters most.</p>
+
+      <p><strong>Q: Is this HIPAA-compliant?</strong><br>
+      A: Yes. Our IT team made sure all data is protected and secure. Talk to your supervisor for specific details.</p>
+
+      <p><strong>Q: What if a youth asks me about their chats?</strong><br>
+      A: You can say: "I see summaries of how you're doing so I can help you better. Your private conversations are between you and the companion." You can also assure them: "You can talk about anything—your feelings, your family, your background, your worries—and it stays private."</p>
+
+      <p><strong>Q: Can I read the full chat messages?</strong><br>
+      A: Usually no—you get summaries only. This protects youth privacy. In rare cases, supervisors can access full messages if there's a safety concern and proper authorization.</p>
+    </div>
+
+    <div class="section-card">
+      <h2>✅ Tips for Success</h2>
+      <ul>
+        <li>✅ <strong>Use the briefings</strong> — They're created to help, so take 5 minutes to review them</li>
+        <li>✅ <strong>Respond to alerts quickly</strong> — The sooner we know, the sooner we can help</li>
+        <li>✅ <strong>Check in person</strong> — This is always the most important step</li>
+        <li>✅ <strong>Document your response</strong> — Keep records of what you observed and did</li>
+        <li>✅ <strong>Trust the youth</strong> — If they say something is wrong, believe them</li>
+        <li>✅ <strong>Ask questions</strong> — If you don't understand an alert, ask your supervisor</li>
+        <li>✅ <strong>Keep it confidential</strong> — Don't share details about youth's chats with other staff unnecessarily</li>
+        <li>✅ <strong>Be culturally humble</strong> — Recognize the youth's unique background and show respect for their experiences</li>
+        <li>✅ <strong>Use translation support</strong> — If language is a barrier, use tools or interpreters to ensure clear communication</li>
+        <li>✅ <strong>Show genuine care</strong> — Remember that every youth deserves to be heard and valued, regardless of where they come from</li>
+      </ul>
+    </div>
+
+    <div class="section-card">
+      <h2>❌ What NOT to Do</h2>
+      <ul>
+        <li>❌ Don't rely on the alert alone — Always do an in-person check</li>
+        <li>❌ Don't share unnecessary details — Use "minimum necessary" information sharing</li>
+        <li>❌ Don't investigate alone if abuse is suspected — Follow safeguarding procedures</li>
+        <li>❌ Don't pressure youth to use it — Let them choose</li>
+        <li>❌ Don't treat it as a crisis hotline — We handle emergencies the same way we always have</li>
+      </ul>
+    </div>
+
+    <div class="section-card">
+      <h2>🆘 Getting Help & Support</h2>
+      <h3>Questions About How to Use It?</h3>
+      <p>Ask your supervisor or the person who trained you on the system.</p>
+
+      <h3>Technical Problem (Can't Log In, etc.)?</h3>
+      <p>Contact [IT Support Email/Phone from your facility]</p>
+
+      <h3>Questions About a Youth's Safety?</h3>
+      <p>Escalate to your supervisor or on-call clinician immediately.</p>
+
+      <h3>Privacy or Confidentiality Concerns?</h3>
+      <p>Talk to your safeguarding lead or facility director.</p>
+    </div>
+
+    <div class="section-card">
+      <h2>❤️ Our Commitment</h2>
+      <p>CareBridge Companion is here to <strong>help us care better</strong>—not to spy on or control youth. It works best when:</p>
+      <ul>
+        <li>We treat it as a helpful tool, not a solution</li>
+        <li>We remember that youth are experts on their own lives</li>
+        <li>We use the information to support them, not judge them</li>
+        <li>We respect privacy and confidentiality</li>
+        <li>We follow facility policy and procedures</li>
+        <li><strong>We honor the dignity, culture, and unique journey of every young person</strong></li>
+        <li><strong>We approach each youth with humility, compassion, and an open heart</strong></li>
+        <li><strong>We recognize that our role is to listen, support, and advocate—not to change who they are</strong></li>
+      </ul>
+
+      <h3>🌍 A Special Note on Welcoming and Understanding</h3>
+      <p>If you work with youth from immigrant backgrounds—whether they arrived last year or with their families when they were very young—know that your care matters deeply. Many of these young people may have experienced loss, displacement, discrimination, or tremendous resilience in ways we may never fully understand.</p>
+      <p>This system is designed to give them a voice and to help <em>us</em> listen better. When you read briefings or respond to alerts from these youth:</p>
+      <ul>
+        <li>✨ <strong>Believe them.</strong> Their feelings are real and valid.</li>
+        <li>✨ <strong>Respect their journey.</strong> They've survived things that shaped them.</li>
+        <li>✨ <strong>Honor their culture.</strong> Encourage them to share their background and identity.</li>
+        <li>✨ <strong>Be patient with language.</strong> If they're still learning English, that doesn't mean they don't understand or that their feelings matter less.</li>
+        <li>✨ <strong>Recognize trauma.</strong> Many immigrant youth have experienced things that deserve compassion, not judgment.</li>
+        <li>✨ <strong>Welcome their whole selves.</strong> Family separation, cultural loss, identity questions—these are all things they need space to process.</li>
+      </ul>
+      <p><strong>No youth should ever feel less welcome, less worthy, or less cared for because of where they come from or how they got here.</strong> Your job is to help them feel safe enough to be themselves, exactly as they are.</p>
+    </div>
+
+    <div class="section-card">
+      <h2>📌 Key Takeaways</h2>
+      <table class="simple-table">
+        <tr>
+          <th>What</th>
+          <th>Why It Matters</th>
+        </tr>
+        <tr>
+          <td><strong>Youth talk to companion</strong></td>
+          <td>Safe space to express feelings</td>
+        </tr>
+        <tr>
+          <td><strong>We get summaries</strong></td>
+          <td>Understand what youth need</td>
+        </tr>
+        <tr>
+          <td><strong>Alerts notify us</strong></td>
+          <td>Catch safety concerns early</td>
+        </tr>
+        <tr>
+          <td><strong>We respond in person</strong></td>
+          <td>Your care is what really helps</td>
+        </tr>
+        <tr>
+          <td><strong>We document</strong></td>
+          <td>Keep records for continuity of care</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="section-card">
+      <h2>💡 Remember</h2>
+      <p>This system is a tool that helps us care better. <strong>You are what matters most.</strong> Your relationship with youth, your attention, your care—that's what makes the real difference.</p>
+      <p>CareBridge Companion is here to support you so you can do your job better.</p>
+      <p><strong>And remember:</strong> Every young person in our care deserves to feel safe, respected, and valued—exactly as they are. Your willingness to understand, to listen, and to care across cultural and linguistic differences makes an enormous difference in their lives. Thank you for the compassion you bring to this work every single day.</p>
+    </div>
+
+    <div class="section-card">
+      <h2>🌈 Diversity, Equity & Inclusion</h2>
+      <p>We believe that:</p>
+      <ul>
+        <li><strong>All youth belong here</strong>, regardless of immigration status, national origin, race, ethnicity, language, religion, gender identity, sexual orientation, or family structure</li>
+        <li><strong>There is no "normal" family</strong>—families come in all configurations, and we honor them all</li>
+        <li><strong>Language differences are strengths</strong>—bilingualism is a gift, not a barrier</li>
+        <li><strong>Cultural pride is encouraged</strong>—youth should be able to talk about where they come from</li>
+        <li><strong>Systemic barriers are real</strong>—we work to understand and reduce them, not blame youth for experiencing them</li>
+        <li><strong>Everyone deserves dignity</strong>—no matter their circumstances</li>
+        <li><strong>Love and understanding are universal languages</strong> that transcend all boundaries</li>
+      </ul>
+      <p>If at any point you feel a youth is being treated unfairly based on their background, please speak up. Everyone deserves an ally.</p>
+    </div>
+
+    <div class="section-card">
+      <h2>❓ Questions?</h2>
+      <p>If you have questions about this system, ask:</p>
+      <ul>
+        <li>Your supervisor</li>
+        <li>Your program director</li>
+        <li>Your training coordinator</li>
+        <li>Your facility's safeguarding lead</li>
+      </ul>
+      <p>We're here to help you help our youth. 🤝</p>
+    </div>
+
+    <p style="text-align: center; color: #777; font-size: 14px; margin-top: 20px;">
+      <strong>Last Updated</strong>: March 2026<br>
+      <strong>Questions or Updates?</strong> Contact your facility director or program coordinator.
+    </p>
+
+    <div class="export-logo">
+       <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--text-color)"><circle cx="12" cy="12" r="10"/></svg>
+    </div>
+  </main>
+</body>
+</html>
