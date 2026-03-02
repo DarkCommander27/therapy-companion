@@ -1,11 +1,11 @@
 /**
  * UserProfile Model
  * Stores user settings and preferences across devices
- * Supports both PIN and password authentication
+ * Supports both PIN and password authentication with encryption utilities
  */
 
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const { hashPassword, comparePassword } = require('../utils/encryption');
 
 const userProfileSchema = new mongoose.Schema({
   userId: {
@@ -72,12 +72,12 @@ const userProfileSchema = new mongoose.Schema({
   }
 });
 
-// Hash password before saving
+// Hash password before saving (using encryption utilities for consistency)
 userProfileSchema.pre('save', async function(next) {
   if (this.authentications.password.hash && !this.authentications.password.hash.startsWith('$2')) {
     try {
-      const salt = await bcrypt.genSalt(10);
-      this.authentications.password.hash = await bcrypt.hash(this.authentications.password.hash, salt);
+      // Use encryption utility for consistent password hashing
+      this.authentications.password.hash = await hashPassword(this.authentications.password.hash);
     } catch (error) {
       return next(error);
     }
@@ -85,12 +85,12 @@ userProfileSchema.pre('save', async function(next) {
   next();
 });
 
-// Method to verify password
+// Method to verify password (using encryption utilities)
 userProfileSchema.methods.verifyPassword = async function(password) {
   if (!this.authentications.password.enabled || !this.authentications.password.hash) {
     return false;
   }
-  return await bcrypt.compare(password, this.authentications.password.hash);
+  return await comparePassword(password, this.authentications.password.hash);
 };
 
 module.exports = mongoose.model('UserProfile', userProfileSchema);

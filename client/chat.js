@@ -505,21 +505,14 @@ function loadSettings() {
   }
   if (savedTheme && !currentTheme) {
     currentTheme = savedTheme;
-  }
-  if (savedUserId && !currentUserId) {
-    currentUserId = savedUserId;
-  }
-}  if (savedTheme) {
-    currentTheme = savedTheme;
     selectThemeByName(savedTheme);
   } else {
     currentTheme = 'mint';
     selectThemeByName('mint');
   }
 
-  if (savedUserId) {
+  if (savedUserId && !currentUserId) {
     currentUserId = savedUserId;
-    document.getElementById('userId').value = savedUserId;
   }
 }
 

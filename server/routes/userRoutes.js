@@ -6,8 +6,9 @@
 const express = require('express');
 const router = express.Router();
 const UserProfile = require('../models/UserProfile');
-const { logger } = require('../utils/logger');
-const { asyncHandler } = require('../utils/errorHandler');
+const logger = require('../utils/logger');
+const { asyncHandler } = require('../middleware/errorHandler');
+const { sanitizeMiddleware } = require('../middleware/sanitization');
 
 // ============================================
 // YOUTH USER AUTHENTICATION
@@ -17,8 +18,15 @@ const { asyncHandler } = require('../utils/errorHandler');
  * Login/Register with PIN or Password
  * POST /api/users/login
  * Body: { userId, pin?, password?, deviceId?, deviceName? }
+ * 
+ * Includes:
+ * - Input sanitization (XSS/injection prevention)
+ * - PIN/Password authentication
+ * - Cross-device tracking
  */
-router.post('/login', asyncHandler(async (req, res) => {
+router.post('/login', 
+  sanitizeMiddleware(), 
+  asyncHandler(async (req, res) => {
   const { userId, pin, password, deviceId, deviceName } = req.body;
 
   if (!userId || (!pin && !password)) {

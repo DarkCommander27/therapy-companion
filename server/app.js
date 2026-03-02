@@ -24,6 +24,8 @@ const {
 
 const { applyRateLimiters } = require('./middleware/rateLimiter');
 const { checkCompanionAvailability, logAvailabilityStatus } = require('./middleware/availabilityCheck');
+const { securitySanitizeMiddleware } = require('./middleware/sanitization');
+const { securityHeadersMiddleware, getCORSConfig } = require('./middleware/securityHeaders');
 
 // Services
 // const AutomatedBriefingScheduler = require('./services/automatedBriefingScheduler'); // TODO: Re-enable after CompanionProfile model created
@@ -42,18 +44,32 @@ const app = express();
 // 1. BASIC MIDDLEWARE
 // ========================================
 
-// CORS
-app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
-  credentials: true
-}));
+// Security headers (HSTS, CSP, X-Frame-Options, etc.)
+app.use(securityHeadersMiddleware());
+
+// CORS with enhanced security configuration
+app.use(cors(getCORSConfig()));
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
+// Input sanitization (XSS + NoSQL injection prevention)
+app.use(securitySanitizeMiddleware({
+  richTextFields: ['content', 'message', 'description', 'bio'],
+  emailFields: ['email', 'emailAddress'],
+  urlFields: ['url', 'website', 'photo', 'avatar']
+}));
+
 // Request logging and error tracking
 app.use(requestErrorTracking);
+
+// ========================================
+// 1.5 STATIC FILES
+// ========================================
+
+// Serve static files from client directory
+app.use(express.static(require('path').join(__dirname, '../client')));
 
 // ========================================
 // 2. RATE LIMITING
@@ -178,9 +194,18 @@ app.use('/api/users', userRoutes);
  */
 app.use('/api/staff', staffRoutes);
 
+/**
+ * Conversation routes - Staff dashboard data access
+ * Example: GET /api/conversations, GET /api/conversations/:sessionId, POST /api/conversations/search
+ * See server/routes/conversationRoutes.js for complete documentation
+ */
+const conversationRoutes = require('./routes/conversationRoutes');
+app.use('/api/conversations', conversationRoutes);
+
 logger.info('Chat routes enabled - streaming and full history storage active');
 logger.info('User routes enabled - PIN/Password authentication and cross-device sync active');
 logger.info('Staff routes enabled - Email/Username authentication and role-based access control active');
+logger.info('Conversation routes enabled - Staff dashboard data access active');
 
 /**
  * Briefing routes

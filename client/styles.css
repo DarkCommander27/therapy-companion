@@ -270,7 +270,7 @@ body {
 
 .status-message.status-error {
   background: rgba(229, 57, 53, 0.1);
-  color: #E5 3935;
+  color: #E53935;
 }
 
 .status-message.status-success {

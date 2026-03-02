@@ -1,14 +1,20 @@
 /**
  * Staff Routes - Authentication & Account Management
  * Handles staff login, registration, and role-based access
+ * Includes brute-force protection and MFA support
  */
 
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const StaffProfile = require('../models/StaffProfile');
-const { logger } = require('../utils/logger');
+const logger = require('../utils/logger');
 const { asyncHandler } = require('../utils/errorHandler');
+const { checkBruteForce, handleFailedLogin, handleSuccessfulLogin } = require('../middleware/bruteForceProtection');
+const { authLimiter, createTokenBucketLimiter } = require('../middleware/rateLimiter');
+const { validateBody, validateParams } = require('../middleware/validation');
+const { sanitizeMiddleware } = require('../middleware/sanitization');
+const { staffLoginSchema, staffCreateSchema } = require('../schemas/staffSchemas');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 const JWT_EXPIRY = '7d'; // Staff sessions valid for 7 days
@@ -56,99 +62,150 @@ const requireAdmin = (req, res, next) => {
  * Staff Login
  * POST /api/staff/login
  * Body: { email or username, password, deviceId?, deviceName? }
+ * 
+ * Includes:
+ * - Brute-force protection (5 attempts in 15 min)
+ * - Rate limiting
+ * - Input validation
+ * - Input sanitization (XSS prevention)
  */
-router.post('/login', asyncHandler(async (req, res) => {
-  const { email, username, password, deviceId, deviceName } = req.body;
+router.post('/login',
+  authLimiter,
+  sanitizeMiddleware({ emailFields: ['email'] }),
+  checkBruteForce(req => req.body.email || req.body.username),
+  validateBody(staffLoginSchema),
+  asyncHandler(async (req, res) => {
+    const { email, username, password, deviceId, deviceName } = req.body;
 
-  if (!password) {
-    return res.status(400).json({ error: 'Password is required' });
-  }
-
-  if (!email && !username) {
-    return res.status(400).json({ error: 'Email or username is required' });
-  }
-
-  // Find staff member by email or username
-  let staffProfile;
-  if (email) {
-    staffProfile = await StaffProfile.findOne({ email: email.toLowerCase() });
-  } else if (username) {
-    staffProfile = await StaffProfile.findOne({ username });
-  }
-
-  if (!staffProfile) {
-    logger.warn(`✗ Failed staff login - Email/Username: ${email || username}`);
-    return res.status(401).json({ error: 'Invalid email/username or password' });
-  }
-
-  if (!staffProfile.isActive) {
-    logger.warn(`✗ Login attempt on inactive account - Email: ${staffProfile.email}`);
-    return res.status(403).json({ error: 'Account has been deactivated' });
-  }
-
-  // Verify password
-  const isPasswordValid = await staffProfile.comparePassword(password);
-
-  if (!isPasswordValid) {
-    logger.warn(`✗ Failed staff login - Invalid password for: ${staffProfile.email}`);
-    return res.status(401).json({ error: 'Invalid email/username or password' });
-  }
-
-  // Update last login and device
-  staffProfile.lastLogin = new Date();
-
-  const deviceIndex = staffProfile.devices.findIndex(d => d.deviceId === deviceId);
-  if (deviceIndex >= 0) {
-    staffProfile.devices[deviceIndex].lastSeen = new Date();
-  } else {
-    staffProfile.devices.push({
-      deviceId: deviceId || `device-${Date.now()}`,
-      deviceName: deviceName || 'Unknown Device',
-      lastSeen: new Date()
-    });
-  }
-
-  await staffProfile.save();
-
-  // Generate JWT token
-  const token = jwt.sign(
-    {
-      staffId: staffProfile._id.toString(),
-      email: staffProfile.email,
-      username: staffProfile.username,
-      role: staffProfile.role,
-      facility: staffProfile.facility
-    },
-    JWT_SECRET,
-    { expiresIn: JWT_EXPIRY }
-  );
-
-  logger.info(`✓ Staff login successful - Email: ${staffProfile.email}, Role: ${staffProfile.role}`);
-
-  res.json({
-    success: true,
-    token,
-    staff: {
-      id: staffProfile._id,
-      email: staffProfile.email,
-      username: staffProfile.username,
-      firstName: staffProfile.firstName,
-      lastName: staffProfile.lastName,
-      role: staffProfile.role,
-      facility: staffProfile.facility,
-      permissions: staffProfile.permissions,
-      avatar: staffProfile.avatar || '👤'
+    // Find staff member by email or username
+    let staffProfile;
+    if (email) {
+      staffProfile = await StaffProfile.findOne({ email: email.toLowerCase() });
+    } else if (username) {
+      staffProfile = await StaffProfile.findOne({ username });
     }
-  });
-}));
+
+    if (!staffProfile) {
+      logger.warn(`✗ Failed staff login - Email/Username: ${email || username}`);
+      const failureStatus = handleFailedLogin(req, res, () => {
+        return res.status(401).json({
+          success: false,
+          error: 'Invalid email/username or password',
+          attemptsRemaining: req.loginFailureStatus?.attemptsRemaining
+        });
+      });
+
+      if (failureStatus.locked) {
+        return res.status(429).json({
+          success: false,
+          error: 'Too many failed login attempts',
+          message: failureStatus.message,
+          retryAfterSeconds: Math.ceil(failureStatus.remainingMs / 1000)
+        });
+      }
+      return;
+    }
+
+    if (!staffProfile.isActive) {
+      logger.warn(`✗ Login attempt on inactive account - Email: ${staffProfile.email}`);
+      return res.status(403).json({
+        success: false,
+        error: 'Account has been deactivated'
+      });
+    }
+
+    // Verify password
+    const isPasswordValid = await staffProfile.comparePassword(password);
+
+    if (!isPasswordValid) {
+      logger.warn(`✗ Failed staff login - Invalid password for: ${staffProfile.email}`);
+      const failureStatus = handleFailedLogin(req, res, () => {
+        return res.status(401).json({
+          success: false,
+          error: 'Invalid email/username or password',
+          attemptsRemaining: req.loginFailureStatus?.attemptsRemaining
+        });
+      });
+
+      if (failureStatus.locked) {
+        return res.status(429).json({
+          success: false,
+          error: 'Too many failed login attempts',
+          message: failureStatus.message,
+          retryAfterSeconds: Math.ceil(failureStatus.remainingMs / 1000)
+        });
+      }
+      return;
+    }
+
+    // Successful authentication - clear brute-force attempts
+    handleSuccessfulLogin(req);
+
+    // Update last login and device
+    staffProfile.lastLogin = new Date();
+
+    const deviceIndex = staffProfile.devices.findIndex(d => d.deviceId === deviceId);
+    if (deviceIndex >= 0) {
+      staffProfile.devices[deviceIndex].lastSeen = new Date();
+    } else {
+      staffProfile.devices.push({
+        deviceId: deviceId || `device-${Date.now()}`,
+        deviceName: deviceName || 'Unknown Device',
+        lastSeen: new Date()
+      });
+    }
+
+    await staffProfile.save();
+
+    // Generate JWT token
+    const token = jwt.sign(
+      {
+        staffId: staffProfile._id.toString(),
+        email: staffProfile.email,
+        username: staffProfile.username,
+        role: staffProfile.role,
+        facility: staffProfile.facility
+      },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRY }
+    );
+
+    logger.info(`✓ Staff login successful - Email: ${staffProfile.email}, Role: ${staffProfile.role}`);
+
+    res.json({
+      success: true,
+      token,
+      staff: {
+        id: staffProfile._id,
+        email: staffProfile.email,
+        username: staffProfile.username,
+        firstName: staffProfile.firstName,
+        lastName: staffProfile.lastName,
+        role: staffProfile.role,
+        facility: staffProfile.facility,
+        permissions: staffProfile.permissions,
+        avatar: staffProfile.avatar || '👤'
+      }
+    });
+  })
+);
 
 /**
  * Staff Registration (Admin-only for now)
  * POST /api/staff/register
  * Headers: Authorization: Bearer <admin-token>
  * Body: { email, username, password, firstName?, lastName?, role, facility }
+ * 
+ * Includes:
+ * - Input sanitization (XSS prevention)
+ * - Email validation
+ * - Authentication verification
  */
-router.post('/register', verifyToken, requireAdmin, asyncHandler(async (req, res) => {
+router.post('/register', 
+  verifyToken, 
+  sanitizeMiddleware({ emailFields: ['email'] }), 
+  requireAdmin, 
+  asyncHandler(async (req, res) => {
   const { email, username, password, firstName, lastName, role, facility } = req.body;
 
   // Validate required fields

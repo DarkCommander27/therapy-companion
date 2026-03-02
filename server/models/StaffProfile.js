@@ -1,10 +1,11 @@
 /**
  * StaffProfile Model
  * Stores staff user accounts with email/username and password authentication
+ * Uses bcrypt for password hashing and supports encryption utilities
  */
 
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const { hashPassword, comparePassword, isBcryptHash } = require('../utils/encryption');
 
 const staffProfileSchema = new mongoose.Schema({
   email: {
@@ -81,22 +82,22 @@ const staffProfileSchema = new mongoose.Schema({
   }
 });
 
-// Hash password before saving
+// Hash password before saving (using bcrypt via encryption utilities)
 staffProfileSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
   
   try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
+    // Use encryption utility for consistent password hashing across app
+    this.password = await hashPassword(this.password);
     next();
   } catch (error) {
     next(error);
   }
 });
 
-// Method to compare passwords
+// Method to compare passwords (using encryption utilities)
 staffProfileSchema.methods.comparePassword = async function(plainPassword) {
-  return await bcrypt.compare(plainPassword, this.password);
+  return await comparePassword(plainPassword, this.password);
 };
 
 module.exports = mongoose.model('StaffProfile', staffProfileSchema);
