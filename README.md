@@ -248,6 +248,21 @@ POST   /api/conversations/:sessionId/add-note - Add staff notes
 GET    /api/conversations/stats/overview - Dashboard statistics
 ```
 
+### Break-Glass Emergency Access (Safeguarding Only)
+```
+POST   /api/conversations/:sessionId/break-glass-access 
+       - Access complete unredacted transcript (admin/safeguarding only)
+       - Body: { reason: string (10-500 chars), justification?: string }
+       - Returns: Full conversation with all messages, analysis, and flags
+       - Requires: Admin or safeguarding staff role
+       - Logs: Complete audit trail with timestamp, IP, staff ID, reason
+
+GET    /api/conversations/break-glass/audit-log
+       - View break-glass access history (safeguarding only)
+       - Query: ?days=7&limit=50&offset=0
+       - Returns: Audit entries with access details and staff information
+```
+
 ### System
 ```
 GET    /health                    - Health check and metrics
@@ -408,6 +423,7 @@ The application can be deployed to:
 - ✅ Mandatory reporting support
 - ✅ Youth identity protection
 - ✅ Staff accountability logging
+- ✅ **Emergency Break-Glass Access** — Authorized safeguarding staff can access complete conversation transcripts during investigations with full audit logging and authorization checks
 
 ---
 

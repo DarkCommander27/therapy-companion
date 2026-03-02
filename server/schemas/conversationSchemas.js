@@ -252,6 +252,26 @@ const batchAddNoteSchema = Joi.object({
   .description('Batch add note request');
 
 // ============================================
+// BREAK-GLASS ACCESS SCHEMA
+// ============================================
+
+const breakGlassAccessSchema = Joi.object({
+  reason: Joi.string()
+    .min(10)
+    .max(500)
+    .required()
+    .trim()
+    .description('Required reason for accessing full transcript (safeguarding investigation, safety concern, etc.)'),
+  
+  justification: Joi.string()
+    .max(1000)
+    .optional()
+    .trim()
+    .description('Additional context or justification for the access')
+}).unknown(false)
+  .description('Break-glass emergency access request');
+
+// ============================================
 // EXPORT SCHEMAS
 // ============================================
 
@@ -266,6 +286,7 @@ module.exports = {
   noteParamsSchema,
   acknowledgeSchema,
   acknowledgeParamsSchema,
+  breakGlassAccessSchema,
   batchAcknowledgeSchema,
   batchAddNoteSchema,
   
