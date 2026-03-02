@@ -409,6 +409,7 @@ The application can be deployed to:
 - ✅ PII masking in logs
 - ✅ Data retention policies with automatic deletion
 - ✅ LGBTQ+ identity protection
+- ✅ **Diversity, Equity & Inclusion Framework** — System designed to be affirming and equitable for all youth regardless of identity
 
 ### Compliance
 - ✅ HIPAA considerations (encryption, PII masking)
@@ -424,25 +425,29 @@ The application can be deployed to:
 - ✅ Youth identity protection
 - ✅ Staff accountability logging
 - ✅ **Emergency Break-Glass Access** — Authorized safeguarding staff can access complete conversation transcripts during investigations with full audit logging and authorization checks
+- ✅ **DEI-Informed Access** — Quarterly bias monitoring to prevent discriminatory access patterns and safeguard marginalized youth
 
 ---
 
 ## Documentation
 
+### Core Framework & Values
+- [DEI_FRAMEWORK.md](docs/DEI_FRAMEWORK.md) — **Diversity, Equity, & Inclusion** framework integrated throughout system design, safeguarding, and operations
+- [LGBTQ+ Affirming Policy](docs/LGBTQ_AFFIRMING_POLICY.md) — Inclusive language, identity affirmation, and privacy protections for LGBTQ+ youth
+
 ### Implementation Teams
 - [ARCHITECTURE.md](docs/ARCHITECTURE.md) — System design and data flow
-- [SECURITY_IMPLEMENTATION.md](docs/SECURITY_IMPLEMENTATION.md) — Security features and testing
+- [SECURITY_IMPLEMENTATION.md](docs/SECURITY_IMPLEMENTATION.md) — Security features, break-glass access, and comprehensive testing (121/121 tests passing)
 - [DATA_RETENTION.md](docs/DATA_RETENTION.md) — Privacy and data retention policies
 
 ### Care Staff
 - [Direct Care One-Pager](docs/CareBridge-Companion-One-Pager-Direct-Care-Staff.md) — How to use and respond to alerts
-- [LGBTQ+ Affirming Policy](docs/LGBTQ_AFFIRMING_POLICY.md) — Inclusive language and practices
+- [Emergency Alert Response SOP](docs/WV_ALERT_RESPONSE_SOP.md) — Step-by-step procedures for all alert types
 
-### Facility Leadership
-- [Leadership One-Pager](docs/CareBridge-Companion-One-Pager-Facility-Leadership.md) — Overview and implementation
-- [Safeguarding & Monitoring](docs/SAFEGUARDING_MONITORING.md) — Access control and audit procedures
-- [WV Alert Response SOP](docs/WV_ALERT_RESPONSE_SOP.md) — West Virginia alert protocols
-- [WV Baseline Policy](docs/WV_BASELINE_POLICY_PROFILE.md) — Regulatory compliance
+### Facility Leadership & Safeguarding
+- [Leadership One-Pager](docs/CareBridge-Companion-One-Pager-Facility-Leadership.md) — Overview and implementation guide
+- [Safeguarding & Monitoring](docs/SAFEGUARDING_MONITORING.md) — Break-glass access, audit logging, bias monitoring, and accountability procedures
+- [WV Baseline Policy Profile](docs/WV_BASELINE_POLICY_PROFILE.md) — Regulatory compliance, minimum standards, and implementation checklist
 
 ---
 

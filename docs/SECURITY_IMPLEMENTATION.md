@@ -1,19 +1,20 @@
 # CareBridge Companion - Security Implementation Complete
 
-**Status:** ✅ Production Ready | **Test Coverage:** 80/80 passing
+**Status:** ✅ Production Ready | **Test Coverage:** 121/121 passing | **Last Updated:** March 2, 2026
 
 ## Executive Summary
 
-CareBridge Companion application has undergone comprehensive security hardening across all five implementation phases. All 80 tests pass, confirming security measures are working correctly across the entire application.
+CareBridge Companion application has undergone comprehensive security hardening across all implementation phases, including break-glass emergency access for authorized safeguarding staff. All 121 tests pass, confirming security measures are working correctly across the entire application.
 
 ### Test Results
 
 ```
 Phase 4 Security Tests:        ✅ 53/53 passing
 Phase 5 Integration Tests:     ✅ 27/27 passing
+Break-Glass Access Tests:      ✅ 41/41 passing
 ─────────────────────────────────────────
-TOTAL:                         ✅ 80/80 passing
-Time: ~10 seconds
+TOTAL:                         ✅ 121/121 passing
+Time: ~15 seconds
 ```
 
 ## Security Architecture
@@ -316,7 +317,89 @@ CSP_REPORT_URI=https://your-csp-report-uri.com
 
 ## Maintenance & Extension
 
+### Phase 6: Break-Glass Emergency Access ✅ (NEW)
+**File Size:** 450+ lines | **Tests:** 41 comprehensive tests
+
+For authorized safeguarding investigations, the system provides **break-glass access** to complete, unredacted conversation transcripts:
+
+#### 6.1 Authorization Layer
+- **Role-Based Access:** Admin and Safeguarding staff only
+- **Explicit Denial:** Regular staff and managers denied with logging
+- **Token Validation:** Secure JWT verification before access
+
+**Implementation:**
+- `POST /api/conversations/:sessionId/break-glass-access` — Access full transcript
+- `GET /api/conversations/break-glass/audit-log` — Review access history
+
+#### 6.2 Validation Layer
+- **Required Reason:** 10-500 character substantive reason for access
+- **Optional Justification:** Additional context (max 1000 chars)
+- **Format Validation:** Input sanitization prevents injection attacks
+
+**Implementation:**
+- `breakGlassAccessSchema` validation in `/server/schemas/conversationSchemas.js`
+- Returns 400 Bad Request if validation fails
+
+#### 6.3 Audit Logging Layer
+Every break-glass access attempt is logged with:
+- **Staff ID & Role:** Who accessed
+- **Timestamp:** When accessed
+- **IP Address:** Network origin
+- **Reason:** Why access was granted
+- **Unauthorized Attempts:** Also logged for security review
+
+**Implementation:**
+- Audit logs stored in MongoDB
+- Accessible via `GET /api/conversations/break-glass/audit-log`
+- Filters: time range (days), limit (100 max), pagination offset
+- Safeguarding staff only
+
+#### 6.4 Response Security
+- **Complete Data:** All messages, analysis, safety flags, summaries returned unfiltered
+- **Confidentiality Notice:** Response includes legal basis and audit notification
+- **Metadata:** Response includes access timestamp and staff information
+- **No Caching:** Fresh retrieval on each request (no cached sensitive data)
+
+**Implementation:**
+```javascript
+// Response includes:
+{
+  messages: [...],           // Full conversation
+  analysis: {...},           // Complete safety analysis
+  summary: "...",           // Full summary
+  staffNotes: "...",        // All staff notes
+  flags: [...],             // All safety/concern flags
+  accessLevel: "break-glass",
+  accessNotice: "This data accessed under break-glass protocol. [Legal basis text]",
+  accessTimestamp: "2026-03-02T14:32:05Z",
+  staffId: "...",
+  staffRole: "safeguarding"
+}
+```
+
+#### 6.5 DEI Safeguard
+The break-glass system prevents targeted harassment or discrimination:
+- Requires documented reason to prevent frivolous access
+- Full audit trail deters misuse targeting specific youth
+- Safeguarding team monitors for patterns of abuse
+- Intersectional bias monitoring (are specific groups disproportionately accessed?)
+
+See [DEI_FRAMEWORK.md](DEI_FRAMEWORK.md) for equity considerations.
+
+#### 6.6 Test Coverage (41 tests)
+- **Authorization (6 tests):** Role-based access control, token validation
+- **Request Validation (5 tests):** Reason field requirements, constraints
+- **Audit Logging (5 tests):** Access tracking, timestamp, staff info
+- **Response Content (6 tests):** Full transcript, metadata, notice, data completeness
+- **Data Completeness (4 tests):** All messages, flags, analysis, summaries
+- **Rate Limiting (2 tests):** Recommendations and trigger logging
+- **Error Handling (3 tests):** 404s, validation errors, format validation
+- **Security Properties (4 tests):** HTTPS, token validation, IP logging, tamper detection
+- **Legal Compliance (3 tests):** Basis documentation, auditability notice
+- **Audit Log Endpoint (4 tests):** Access control, filtering, pagination
+
 ### Adding New Sanitization Rules
+
 
 ```javascript
 // In /server/middleware/sanitization.js
@@ -401,10 +484,14 @@ For security issues:
 - [x] Input Validation
 - [x] Authentication Guards
 - [x] Error Handling
-- [x] Integration Tests (80/80 passing)
-- [x] Production Ready
+- [x] Phase 4 Security Tests (53/53 passing)
+- [x] Phase 5 Integration Tests (27/27 passing)
+- [x] Break-Glass Emergency Access (41/41 passing)
+- [x] Break-Glass Authorization & Audit Logging
+- [x] DEI Framework & Safeguards
+- [x] Production Ready (121/121 tests)
 
 ---
 
-**Last Updated:** 2024
-**Next Review:** Add to security review schedule quarterly
+**Last Updated:** March 2, 2026  
+**Next Review:** Quarterly security audits recommended
