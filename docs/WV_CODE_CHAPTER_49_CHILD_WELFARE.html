@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>West Virginia Code Chapter 49 - Child Welfare</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 1.7;
+            color: #222;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 50px 40px;
+            text-align: center;
+            border-bottom: 4px solid #e74c3c;
+        }
+
+        header h1 {
+            font-size: 2.2em;
+            margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+            margin: 8px 0;
+            font-weight: 300;
+        }
+
+        .meta {
+            font-size: 0.9em;
+            opacity: 0.85;
+            margin-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            padding-top: 15px;
+        }
+
+        nav {
+            background: #ecf0f1;
+            padding: 30px;
+            border-bottom: 2px solid #bdc3c7;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        nav ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        nav a {
+            color: #2980b9;
+            text-decoration: none;
+            padding: 8px 12px;
+            display: block;
+            border-left: 3px solid transparent;
+            transition: all 0.3s;
+            font-size: 0.95em;
+        }
+
+        nav a:hover {
+            background: #d5dbdb;
+            border-left-color: #e74c3c;
+            padding-left: 20px;
+            color: #c0392b;
+        }
+
+        main {
+            padding: 40px;
+        }
+
+        section {
+            margin-bottom: 40px;
+            border-bottom: 1px solid #ecf0f1;
+            padding-bottom: 30px;
+        }
+
+        section:last-child {
+            border-bottom: none;
+        }
+
+        h2 {
+            color: #2c3e50;
+            font-size: 1.7em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #e74c3c;
+            display: inline-block;
+        }
+
+        h3 {
+            color: #34495e;
+            font-size: 1.3em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        h4 {
+            color: #5d6d7b;
+            font-size: 1.05em;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        ul, ol {
+            margin: 15px 0 15px 35px;
+            line-height: 1.8;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        .statute-ref {
+            background: #ecf0f1;
+            padding: 3px 8px;
+            border-left: 3px solid #3498db;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            color: #2c3e50;
+            display: inline-block;
+            margin: 0 2px;
+        }
+
+        .definition {
+            background: #fef8e7;
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 3px;
+        }
+
+        .definition strong {
+            color: #d68910;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 3px;
+        }
+
+        .article {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .article-title {
+            color: #2c3e50;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e74c3c;
+            padding-bottom: 10px;
+        }
+
+        .subsection {
+            margin-left: 20px;
+            margin-top: 12px;
+            padding-left: 15px;
+            border-left: 2px solid #bdc3c7;
+        }
+
+        .subsection-title {
+            color: #34495e;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #d63031;
+        }
+
+        .toc {
+            background: #ecf0f1;
+            border: 2px solid #2c3e50;
+            border-radius: 5px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .toc h3 {
+            color: #2c3e50;
+            margin-top: 0;
+            border-bottom: 2px solid #e74c3c;
+            padding-bottom: 10px;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list a {
+            color: #2980b9;
+            text-decoration: none;
+            display: block;
+            padding: 6px 0;
+            transition: color 0.3s;
+        }
+
+        .toc-list a:hover {
+            color: #e74c3c;
+            text-decoration: underline;
+        }
+
+        .section-id {
+            color: #7f8c8d;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        footer {
+            background: #2c3e50;
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        footer p {
+            margin: 5px 0;
+            color: #ecf0f1;
+        }
+
+        @media (max-width: 768px) {
+            main {
+                padding: 20px;
+            }
+
+            header {
+                padding: 30px 20px;
+            }
+
+            header h1 {
+                font-size: 1.6em;
+            }
+
+            nav ul {
+                grid-template-columns: 1fr;
+            }
+
+            h2 {
+                font-size: 1.3em;
+            }
+
+            .container {
+                border-radius: 0;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .container {
+                box-shadow: none;
+                max-width: 100%;
+            }
+
+            nav {
+                display: none;
+            }
+
+            header {
+                page-break-after: avoid;
+            }
+
+            section {
+                page-break-inside: avoid;
+            }
+
+            h2 {
+                page-break-after: avoid;
+            }
+        }
+
+        .back-to-top {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 3px;
+            transition: background 0.3s;
+            font-size: 0.9em;
+        }
+
+        .back-to-top:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>West Virginia Code</h1>
+            <p>Chapter 49 — Child Welfare</p>
+            <div class="meta">
+                <p><strong>Comprehensive child welfare legislation including child protection, abuse/neglect definitions, and family rights</strong></p>
+                <p>Last Updated: March 3, 2026</p>
+            </div>
+        </header>
+
+        <nav>
+            <h3>Quick Navigation</h3>
+            <ul>
+                <li><a href="#article-1">Article 1: General Provisions</a></li>
+                <li><a href="#article-11">Article 11: Systemic Reporting</a></li>
+                <li><a href="#article-12">Article 12: Parents' Bill of Rights</a></li>
+                <li><a href="#definitions">Key Definitions</a></li>
+                <li><a href="#purposes">Purpose & Intent</a></li>
+                <li><a href="#legal-terms">Legal Terminology</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <section id="overview">
+                <h2>Overview</h2>
+                <p>West Virginia Code <strong>Chapter 49</strong> provides comprehensive legislation governing child welfare services, child protection, juvenile justice, and the rights of parents and families in the state. This code establishes:</p>
+                <ul>
+                    <li>Purpose and structure of the state's child welfare system</li>
+                    <li>Definitions of child abuse, neglect, and related conditions</li>
+                    <li>Procedures for child protection and family services</li>
+                    <li>Parental rights and responsibilities</li>
+                    <li>Licensing and approval of child care facilities</li>
+                    <li>Systemic reporting and transparency requirements</li>
+                    <li>Protections for parents and guardians</li>
+                </ul>
+                <p>The code emphasizes <strong>family-centered services</strong>, <strong>child safety</strong>, and <strong>community-based interventions</strong> in the least restrictive settings possible.</p>
+            </section>
+
+            <section id="article-1">
+                <h2>Article 1: General Provisions and Definitions</h2>
+
+                <h3>§49-1-101: Short Title and Intent</h3>
+                <div class="section-id">File Code: §49-1-101</div>
+                <p>This chapter is known and cited as the <strong>"West Virginia Child Welfare Act."</strong></p>
+                <p>The recodification during the 2015 legislative session is intended to consolidate and codify all state child welfare laws in revised form without altering substantive law or increasing funding obligations.</p>
+
+                <h3>§49-1-102: Legislative Intent</h3>
+                <div class="section-id">File Code: §49-1-102</div>
+                <p>In the 2015 recodification:</p>
+                <ul>
+                    <li>Each reenactment continues the intended meaning of prior provisions</li>
+                    <li>Existing judicial interpretations are preserved</li>
+                    <li>No substantive changes to child welfare law are intended</li>
+                    <li>No increase in funding obligations to state or local agencies</li>
+                </ul>
+
+                <h3>§49-1-105: Purpose of the Child Welfare System</h3>
+                <div class="section-id">File Code: §49-1-105</div>
+                <div class="highlight">
+                    <p><strong>The state has a duty to assure that proper and appropriate care is given and maintained for children.</strong></p>
+                </div>
+
+                <p>The child welfare and juvenile justice system shall:</p>
+                <ol>
+                    <li><strong>Assure each child care, safety and guidance</strong></li>
+                    <li><strong>Serve the mental and physical welfare</strong> of the child</li>
+                    <li><strong>Preserve and strengthen</strong> child-family ties</li>
+                    <li><strong>Recognize fundamental rights</strong> of children and parents</li>
+                    <li><strong>Develop family-focused</strong> (not individual-focused) procedures and programs</li>
+                    <li><strong>Involve the child, family,</strong> or caregiver in planning and service delivery</li>
+                    <li><strong>Provide community-based services</strong> in least restrictive settings</li>
+                    <li><strong>Provide early identification</strong> of problems and prevent abuse/neglect</li>
+                    <li><strong>Provide rehabilitation</strong> for status offenders and juvenile delinquents</li>
+                    <li><strong>Provide secure detention</strong> when necessary for alleged/adjudicated delinquents</li>
+                    <li><strong>Protect public welfare</strong></li>
+                </ol>
+
+                <h3>§49-1-106: Location of Services</h3>
+                <div class="section-id">File Code: §49-1-106</div>
+                <p><strong>Child welfare services</strong> are located within and administered by the <strong>Bureau for Social Services</strong> within the Department of Human Services.</p>
+                <p>The Department of Human Services is designated as the state entity to:</p>
+                <ul>
+                    <li>Cooperate with federal health and justice agencies</li>
+                    <li>Comply with federal regulations</li>
+                    <li>Receive and expend federal funds</li>
+                </ul>
+            </section>
+
+            <section id="definitions">
+                <h2>Part II: Key Definitions</h2>
+
+                <h3>§49-1-201: Definitions Related to Child Abuse and Neglect</h3>
+                <div class="section-id">File Code: §49-1-201</div>
+
+                <div class="definition">
+                    <strong>"Abused Child" means:</strong> A child whose health or welfare is being harmed or threatened by:
+                    <ul>
+                        <li><strong>Physical injury or mental/emotional injury</strong> inflicted by a parent, guardian, or custodian (including excessive corporal punishment)</li>
+                        <li><strong>Sexual abuse or sexual exploitation</strong></li>
+                        <li><strong>Sale or attempted sale</strong> in violation of WV Code</li>
+                        <li><strong>Domestic violence</strong> (as defined in WV Code §48-27-202)</li>
+                        <li><strong>Human trafficking</strong> or attempted trafficking</li>
+                    </ul>
+                </div>
+
+                <div class="definition">
+                    <strong>"Neglected Child" means:</strong> A child whose physical or mental health is harmed or threatened by:
+                    <ul>
+                        <li>Present <strong>refusal, failure, or inability</strong> to provide necessary <strong>food, clothing, shelter, supervision, medical care, or education</strong></li>
+                        <li><strong>Absence or disappearance</strong> of parent/custodian leaving child without necessities</li>
+                    </ul>
+                    <p><em>Note: Does not apply to children whose education is conducted under home education provisions (§18-8-1 et seq.)</em></p>
+                </div>
+
+                <div class="definition">
+                    <strong>"Sexual Abuse" means:</strong>
+                    <ul>
+                        <li>Sexual intercourse, intrusion, or contact (proscribed by WV Code §61-8c-3) engaged in or procured by a parent/guardian/custodian with a child</li>
+                        <li>Displaying sex organs to a child for sexual gratification or to affront/alarm the child</li>
+                        <li>Certain criminal offenses (WV Code §61-8b-7, -8, -9)</li>
+                    </ul>
+                </div>
+
+                <div class="definition">
+                    <strong>"Sexual Exploitation" means:</strong>
+                    <ul>
+                        <li>Persuading, inducing, enticing, or coercing a child to engage in sexually explicit conduct</li>
+                        <li>Persuading a child to display sex organs for gratification or under circumstances likely to be observed by others</li>
+                        <li>Knowingly maintaining or making available a child for commercial sexual activity</li>
+                    </ul>
+                </div>
+
+                <div class="definition">
+                    <strong>"Serious Physical Abuse" means:</strong> Bodily injury that creates substantial risk of death, causes serious/prolonged disfigurement, prolonged impairment of health, or prolonged loss/impairment of bodily function.
+                </div>
+
+                <div class="definition">
+                    <strong>"Imminent Danger to Physical Well-Being" means:</strong> An emergency situation where the welfare or life of the child is threatened, including:
+                    <ul>
+                        <li>Nonaccidental trauma inflicted by caretaker</li>
+                        <li>Pattern of abuse (battered child syndrome)</li>
+                        <li>Nutritional deprivation or abandonment</li>
+                        <li>Inadequate treatment of serious illness/disease</li>
+                        <li>Substantial emotional injury inflicted by parent/guardian/custodian</li>
+                        <li>Sale or attempted sale of the child</li>
+                        <li>Parent/guardian alcohol/drug abuse impairing parenting skills to pose imminent risk</li>
+                        <li>Any other condition threatening health, life, or safety</li>
+                    </ul>
+                </div>
+
+                <h3>§49-1-202: Definitions Related to Child, Adult, and Status</h3>
+                <div class="section-id">File Code: §49-1-202</div>
+
+                <div class="definition">
+                    <strong>"Child" or "Juvenile" means:</strong> Any person under 18 years of age or a transitioning adult. For child care services:
+                    <ul>
+                        <li>Under 13 years of age, OR</li>
+                        <li>13-18 years of age and under court supervision, OR</li>
+                        <li>13-18 years of age with significant developmental delay</li>
+                    </ul>
+                </div>
+
+                <div class="definition">
+                    <strong>"Transitioning Adult" means:</strong> An individual 18-21 years of age who:
+                    <ul>
+                        <li>Was in custody of Department of Human Services at age 18, committed delinquency before 18, and remains under juvenile court jurisdiction; OR</li>
+                        <li>Was adjudicated abused/neglected or in DHS custody at age 18 and enters contract to continue in educational/training program initiated before age 18</li>
+                    </ul>
+                </div>
+
+                <div class="definition">
+                    <strong>"Juvenile Delinquent" means:</strong> A juvenile adjudicated as one who commits an act that would be a crime if committed by an adult.
+                </div>
+
+                <div class="definition">
+                    <strong>"Status Offender" means:</strong> A juvenile adjudicated as one who:
+                    <ul>
+                        <li>Habitually refuses lawful supervision endangering health/safety, OR</li>
+                        <li>Left care without consent/good cause, OR</li>
+                        <li>Is habitually absent from school without good cause</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="licensing">
+                <h2>Part III: Licensing and Approval</h2>
+
+                <h3>§49-1-203: Licensing and Approval Definitions</h3>
+                <div class="section-id">File Code: §49-1-203</div>
+
+                <p>The code defines several important regulatory designations:</p>
+
+                <div class="definition">
+                    <strong>"License"</strong> means official permission to engage in an activity that would otherwise be prohibited.
+                </div>
+
+                <div class="definition">
+                    <strong>"Approval"</strong> means a finding that a state-operated facility has met requirements and a certificate of approval/operation has been issued.
+                </div>
+
+                <div class="definition">
+                    <strong>"Registration"</strong> means official permission to a family child care home, informal family child care home, or relative family child care home determined to be in compliance with legislative rules.
+                </div>
+
+                <p>The code establishes that regulation seeks to balance:</p>
+                <ul>
+                    <li><strong>Child protection</strong> — Protecting users from risks they cannot self-protect against</li>
+                    <li><strong>Provider interests</strong> — Not over-encumbering quality providers with excessive licensure requirements</li>
+                    <li><strong>Proportionality</strong> — Regulations proportionate to facility size</li>
+                </ul>
+            </section>
+
+            <section id="custodians">
+                <h2>Part IV: Custodians, Guardians, and Family</h2>
+
+                <h3>§49-1-204: Family-Related Definitions</h3>
+                <div class="section-id">File Code: §49-1-204</div>
+
+                <div class="definition">
+                    <strong>"Caregiver"</strong> means any person at least 18 years of age who is:
+                    <ul>
+                        <li>Related by blood, marriage, or adoption (but not legal custodian/guardian), OR</li>
+                        <li>Has resided with the minor continuously for 6+ months</li>
+                    </ul>
+                </div>
+
+                <div class="definition">
+                    <strong>"Custodian"</strong> means a person who has or shares actual physical possession or care/custody of a child, regardless of legal custody status.
+                </div>
+
+                <p>These definitions recognize the various family structures and caregiving arrangements present in modern families.</p>
+            </section>
+
+            <section id="article-11">
+                <h2>Article 11: Systemic Reporting Transparency</h2>
+
+                <h3>§49-11-101: Child Welfare Data Dashboard</h3>
+                <div class="section-id">File Code: §49-11-101</div>
+
+                <div class="highlight">
+                    <p><strong>Effective July 1, 2026:</strong> The Commissioner must maintain a publicly accessible <strong>child welfare data dashboard</strong> with monthly updates on system-wide issues.</p>
+                </div>
+
+                <h4>Required Data Elements:</h4>
+                <ul>
+                    <li><strong>System-level performance indicators:</strong> Intake hotline, field investigation, case management, out-of-home placement</li>
+                    <li><strong>Federally mandated indicators:</strong> Time to first contact with all children, children in non-placement/temporary lodging status</li>
+                    <li><strong>Child fatality/near-fatality information:</strong> Within 48 hours, including date, sex, and age; link to Critical Incident Review Team reports within 24 hours</li>
+                    <li><strong>Workforce information:</strong> Child protective services staff hired/not yet trained, adoption worker vacancies, home finder vacancies</li>
+                </ul>
+
+                <h4>Data Accessibility Features:</h4>
+                <ul>
+                    <li>Point-in-time numbers with trend analysis</li>
+                    <li>Searchable by reporting date and county (starting July 1, 2026)</li>
+                    <li>Data suppression permitted to protect individual identification</li>
+                </ul>
+
+                <p>This requirement emphasizes <strong>transparency and accountability</strong> in the state's child welfare system.</p>
+            </section>
+
+            <section id="article-12">
+                <h2>Article 12: Parents' Bill of Rights</h2>
+
+                <h3>§49-12-1: Short Title</h3>
+                <div class="section-id">File Code: §49-12-1</div>
+                <p>This article is known and may be cited as the <strong>"Parents' Bill of Rights"</strong></p>
+
+                <h3>§49-12-2: Legislative Findings and Definition</h3>
+                <div class="section-id">File Code: §49-12-2</div>
+
+                <div class="highlight">
+                    <p><strong>The Legislature finds that it is a fundamental right of parents to direct the upbringing, education, care, and medical care of their minor children.</strong></p>
+                </div>
+
+                <p>Important information relating to a child should not be withheld—either inadvertently or purposefully—from the parent, including information relating to:</p>
+                <ul>
+                    <li>Health and well-being</li>
+                    <li>Education</li>
+                    <li>Other information while the child is in school district custody</li>
+                </ul>
+
+                <div class="definition">
+                    <strong>"Parent"</strong> means a person who has legal custody of a minor child as a natural or adoptive parent or legal guardian.
+                </div>
+
+                <h3>§49-12-3: Infringement of Parental Rights</h3>
+                <div class="section-id">File Code: §49-12-3</div>
+
+                <div class="highlight">
+                    <p><strong>The state, its subdivisions, governmental entities, or institutions may not infringe on fundamental parental rights without demonstrating:</strong></p>
+                </div>
+
+                <ol>
+                    <li><strong>Reasonableness and necessity</strong> for a compelling state interest</li>
+                    <li><strong>Narrow tailoring</strong> of the action</li>
+                    <li><strong>No less restrictive means</strong> available to achieve the interest</li>
+                </ol>
+
+                <h3>§49-12-4: Enumerated Parental Rights</h3>
+                <div class="section-id">File Code: §49-12-4</div>
+
+                <div class="article">
+                    <div class="article-title">All parental rights are reserved to the parent without obstruction or interference, including:</div>
+
+                    <div class="subsection">
+                        <div class="subsection-title">1. Right to Direct Education and Care</div>
+                        <p>Parents have the right to direct the education and care of their minor child.</p>
+                    </div>
+
+                    <div class="subsection">
+                        <div class="subsection-title">2. Right to Direct Upbringing and Moral/Religious Training</div>
+                        <p>Parents have the right to direct upbringing and the moral or religious training of their minor child.</p>
+                    </div>
+
+                    <div class="subsection">
+                        <div class="subsection-title">3. Right to Choose Educational Setting</div>
+                        <p>Parents have the right to apply to enroll their minor child in:</p>
+                        <ul>
+                            <li>Public school</li>
+                            <li>Private/religious school</li>
+                            <li>Home education program</li>
+                            <li>Other available options authorized by law</li>
+                        </ul>
+                    </div>
+
+                    <div class="subsection">
+                        <div class="subsection-title">4. Right to Access School Records</div>
+                        <p>Parents have the right to access and review all school records relating to their minor child.</p>
+                    </div>
+
+                    <div class="subsection">
+                        <div class="subsection-title">5. Right to Make Health Care Decisions</div>
+                        <p>Parents have the right to make health care decisions for their minor child, unless otherwise prohibited by law.</p>
+                    </div>
+                </div>
+
+                <h4>Non-Discrimination Clause</h4>
+                <p>The right to parental rights guaranteed by this article shall <strong>not be denied or abridged on account of disability.</strong></p>
+
+                <h4>Legal Remedies</h4>
+                <p>A parent may raise this article as a defense before any court or administrative tribunal. Any person aggrieved may bring an action for <strong>injunctive relief</strong> in circuit court against a person engaging in conduct violating this article. The court may grant:</p>
+                <ul>
+                    <li>Temporary restraining orders</li>
+                    <li>Preliminary injunctions</li>
+                    <li>Permanent injunctions</li>
+                </ul>
+            </section>
+
+            <section id="purposes">
+                <h2>Summary: Core Purposes and Intent</h2>
+
+                <div class="highlight">
+                    <h3>The West Virginia Child Welfare Act Seeks To:</h3>
+                    <ul>
+                        <li><strong>Assure safety, care, and guidance</strong> for all children</li>
+                        <li><strong>Serve child welfare</strong> physically and mentally</li>
+                        <li><strong>Preserve family ties</strong> when possible</li>
+                        <li><strong>Respect fundamental rights</strong> of both children and parents</li>
+                        <li><strong>Provide family-centered</strong> rather than individual-centered services</li>
+                        <li><strong>Use community-based, least restrictive</strong> interventions</li>
+                        <li><strong>Prevent abuse and neglect</strong> through early identification</li>
+                        <li><strong>Maintain transparency</strong> and accountability to the public</li>
+                        <li><strong>Protect parental rights</strong> while ensuring child safety</li>
+                    </ul>
+                </div>
+
+                <p>The code balances <strong>child protection</strong> with <strong>parental rights</strong>, establishing a framework where:</p>
+                <ul>
+                    <li>Child welfare is paramount</li>
+                    <li>Parents retain fundamental rights unless compelling state interest requires intervention</li>
+                    <li>Interventions must be narrowly tailored and use least restrictive means</li>
+                    <li>Services favor community-based and family-centered approaches</li>
+                    <li>The state must operate with transparency and accountability</li>
+                </ul>
+            </section>
+
+            <section id="legal-terms">
+                <h2>Important Legal Terminology</h2>
+
+                <h3>Key Legal Concepts</h3>
+
+                <div class="definition">
+                    <strong>"Reasonable and Necessary":</strong> A legal standard requiring that state action infringing on parental rights must be both reasonable (practical/sensible) and necessary (essential, not optional).
+                </div>
+
+                <div class="definition">
+                    <strong>"Compelling State Interest":</strong> A legal standard where the government has an overriding objective of utmost importance. Child safety is recognized as a compelling state interest in West Virginia law.
+                </div>
+
+                <div class="definition">
+                    <strong>"Narrowly Tailored":</strong> A legal standard requiring that any government action be the least broad/restrictive means necessary to achieve the compelling interest.
+                </div>
+
+                <div class="definition">
+                    <strong>"Least Restrictive Setting":</strong> A principle requiring that services be provided in environments that impose the fewest limitations on freedom possible while meeting the child's needs.
+                </div>
+
+                <div class="definition">
+                    <strong>"Family-Centered":</strong> An approach to service provision that views the family as a unit and develops interventions addressing family-level issues rather than individual problems.
+                </div>
+
+                <div class="definition">
+                    <strong>"Injunctive Relief":</strong> A court order (restraining order, preliminary or permanent injunction) requiring a person to stop or start specific conduct.
+                </div>
+            </section>
+
+            <a href="#top" class="back-to-top">↑ Back to Top</a>
+        </main>
+
+        <footer>
+            <p><strong>West Virginia Code Chapter 49 — Child Welfare</strong></p>
+            <p>Comprehensive legislation governing child protection, family services, and parental rights in West Virginia</p>
+            <p style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 15px; font-size: 0.85em;">This is a formatted reference document. For the complete official text and any recent amendments, consult the West Virginia Legislature website or official legal code repositories.</p>
+        </footer>
+    </div>
+</body>
+</html>
