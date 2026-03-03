@@ -56,6 +56,109 @@ In group living, several things happen:
 
 ---
 
+## Diversity, Equity, and Inclusion (DEI) — Our Core Commitment
+
+CareBridge Companion is **designed from the ground up** with a commitment to Diversity, Equity, and Inclusion. This isn't an add-on; it's foundational to how the system works and how you use it.
+
+### Why DEI Matters in Care
+
+In group living, youth from marginalized backgrounds often face:
+- **Invisibility** — Their experiences and identities overlooked
+- **Bias** — Stereotypes that affect care decisions
+- **Barriers** — Discrimination that prevents open communication
+- **Chilling effects** — Fear of consequences for disclosing identity or experiences
+
+CareBridge is designed to counteract these patterns.
+
+### DEI Principles Built Into the System
+
+**1. Diversity — All Youth Belong Here**
+- The companion uses **affirming language** from the start, regardless of identity
+- Youth can share about any aspect of themselves — sexuality, gender, race, religion, family structure, disability — without judgment
+- Briefings preserve context about youth identity and background (when relevant to care)
+- System design recognizes youth hold **multiple identities at once** (e.g., Black LGBTQ+ youth, disabled immigrant youth)
+
+**2. Equity — Everyone Gets What They Need**
+- All youth have **equal access** — no barriers based on cost, technology, language
+- **24/7 availability** means youth who are isolated or unsupervised at night can reach out
+- **Customized briefings** adapted to individual youth's needs and identity
+- **Fair safety monitoring** that doesn't over-flag marginalized youth for normal experiences (crying, discussing discrimination, exploring identity)
+
+**3. Inclusion — Youth Feel Safe and Affirmed**
+- Staff cannot message youth (no grooming, no inappropriate contact)
+- All staff access is logged and monitored to prevent targeting
+- Quarterly bias reviews ensure alerts are fair across all youth
+- Youth privacy around identity is protected — information only shared when necessary for care
+
+### What This Means for Your Work
+
+**Affirming Language & Attitude**
+- Use **chosen names and pronouns** — always
+- Don't make assumptions about family, relationships, or identity
+- Recognize that exploring identity is **normal, healthy development**, not a problem
+- Validate diverse backgrounds, cultures, religions, and family structures
+
+**Recognizing Bias (Including Your Own)**
+- Be aware that you may have unconscious biases — we all do
+- Don't let assumptions about appearance, background, or identity drive your care
+- Ask yourself: "Am I responding differently to this youth because of their identity?"
+- Listen to youth when they tell you they've experienced discrimination
+
+**Equitable Care Across the Team**
+- Use the briefing summaries to give **all youth consistent attention**
+- Don't let one youth dominate your focus while others get overlooked
+- Make sure quieter or less "visible" youth still get checked on
+- Notice if certain youth are flagged more often — bring it up with your supervisor
+
+**Equity in Escalation**
+- When you escalate a concern, check your own bias
+- Would you escalate the same message from a different youth?
+- Are you treating LGBTQ+ youth disclosure as "crisis" when it's just self-disclosure?
+- Are you over-responding to behaviors that are normal for some youth?
+
+### LGBTQ+ Affirming Care (Specific Commitment)
+
+For LGBTQ+ youth specifically:
+
+✅ **What to Do:**
+- Honor chosen names and pronouns, 100% of the time
+- Create space for youth to explore identity safely
+- Validate LGBTQ+ identity and relationships as normal
+- Protect identity information (especially in unsupportive environments)
+- Escalate discrimination or identity-based harassment immediately
+
+❌ **What NOT to Do:**
+- Pathologize LGBTQ+ identity ("Is this phase?" or "Are you sure?")
+- Correct pronouns or use deadnames
+- Allow other youth to bully or harass LGBTQ+ peers
+- Share identity information without consent
+- Assume religious belief overrides affirming practice
+
+**More detail:** See [LGBTQ_AFFIRMING_POLICY.md](LGBTQ_AFFIRMING_POLICY.md) for comprehensive commitments.
+
+### Quarterly Bias Monitoring (Everyone's Job)
+
+Your facility should review quarterly:
+- **Are safety alerts distributed fairly?** Are certain groups flagged more?
+- **Do briefings respect identity?** Or do they reinforce stereotypes?
+- **Is break-glass access used appropriately?** Any suspicious patterns?
+- **Have any youth reported discrimination?** By staff or peers?
+
+**You can contribute** by:
+- Providing feedback if an alert seems off
+- Flagging bias you notice in briefings or alerts
+- Letting leadership know if a youth reports discrimination
+- Being honest in staff conversations about your own biases
+
+### Resources & Full Framework
+
+For more detail on CareBridge's DEI commitments, see:
+- **[DEI_FRAMEWORK.md](../docs/DEI_FRAMEWORK.md)** — Comprehensive framework with implementation details
+- **[LGBTQ_AFFIRMING_POLICY.md](../docs/LGBTQ_AFFIRMING_POLICY.md)** — Specific commitments to LGBTQ+ youth care
+- **[SAFEGUARDING_MONITORING.md](../docs/SAFEGUARDING_MONITORING.md)** — How we prevent bias in access and monitoring
+
+---
+
 ## The System in Simple Terms
 
 ### For Youth
