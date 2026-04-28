@@ -2,7 +2,9 @@
 // CAREBRIDGE COMPANION - CHAT INTERFACE
 // ============================================
 
-const API_URL = 'http://localhost:3000';
+const API_URL = window.location.protocol === 'file:'
+  ? 'http://localhost:3000'
+  : window.location.origin;
 
 let currentSession = null;
 let currentUserId = null;
@@ -14,6 +16,68 @@ let currentTheme = 'mint';
 let messageCount = 0;
 let isNewUser = false;
 let currentAuthMethod = 'pin'; // 'pin', 'password', or 'staff'
+let demoMode = false;
+let currentDemoScenario = 'guided';
+let apiAvailable = false;
+
+const demoScenarios = {
+  guided: {
+    title: 'Guided Youth Check-In',
+    summary: 'Use this to present a supportive youth check-in, light personalization, and the way staff gain useful context without displacing direct care relationships.',
+    status: 'Demo mode: supportive check-in flow',
+    avatar: '🌈',
+    theme: 'ocean',
+    userId: 'demo-youth-01',
+    placeholder: 'Try a demo prompt or type your own message...',
+    transcript: [
+      {
+        role: 'assistant',
+        content: 'Hi, I am CareBridge Companion. This demo illustrates how a young person can check in, feel heard, and still have important concerns surfaced for staff follow-up when appropriate.'
+      },
+      {
+        role: 'user',
+        content: 'I am kind of stressed after school and a family call.'
+      },
+      {
+        role: 'assistant',
+        content: 'Thank you for sharing that. I can reflect what may be contributing to the stress, offer a few grounding ideas, and help the care team notice patterns that may warrant thoughtful follow-up.'
+      }
+    ],
+    prompts: [
+      'I am feeling anxious after a family visit.',
+      'What could help me calm down before bedtime?',
+      'I want to talk, but I do not want a big reaction.'
+    ]
+  },
+  safety: {
+    title: 'Safety Alert Walkthrough',
+    summary: 'Use this to explain how concerning language can trigger documented staff review, time-sensitive escalation, and appropriate human follow-up while keeping the system framed as a support tool rather than crisis care.',
+    status: 'Demo mode: safety escalation story',
+    avatar: '🧠',
+    theme: 'coral',
+    userId: 'demo-youth-alert',
+    placeholder: 'Ask about safety follow-up or try a prompt...',
+    transcript: [
+      {
+        role: 'assistant',
+        content: 'This scenario demonstrates how the companion can respond supportively while flagging a potential safeguarding concern for staff review under facility protocols.'
+      },
+      {
+        role: 'user',
+        content: 'I do not feel safe going back to my room right now.'
+      },
+      {
+        role: 'assistant',
+        content: 'Thank you for saying that clearly. In a live deployment, this kind of message could be logged as a time-sensitive concern, routed for staff review, and included in follow-up documentation so an appropriate response can occur promptly.'
+      }
+    ],
+    prompts: [
+      'I do not feel safe going back to my room right now.',
+      'Can someone check on me without making it a huge scene?',
+      'What happens when the system thinks a follow-up is needed?'
+    ]
+  }
+};
 
 // ============================================
 // DOM ELEMENTS
@@ -42,6 +106,9 @@ const staffPassword = document.getElementById('staffPassword');
 const rememberDevice = document.getElementById('rememberDevice');
 const staffLoginBtn = document.getElementById('staffLoginBtn');
 const loginStatusStaff = document.getElementById('loginStatusStaff');
+const demoStatus = document.getElementById('demoStatus');
+const startGuidedDemoBtn = document.getElementById('startGuidedDemoBtn');
+const startSafetyDemoBtn = document.getElementById('startSafetyDemoBtn');
 
 // Auth Method Selector
 const authMethodBtns = document.querySelectorAll('.auth-method-btn');
@@ -59,19 +126,29 @@ const newChatBtn = document.getElementById('newChatBtn');
 const loadingIndicator = document.getElementById('loadingIndicator');
 const statusText = document.getElementById('statusText');
 const headerAvatar = document.getElementById('headerAvatar');
+const demoControlPanel = document.getElementById('demoControlPanel');
+const demoScenarioTitle = document.getElementById('demoScenarioTitle');
+const demoScenarioSummary = document.getElementById('demoScenarioSummary');
+const demoPromptButtons = document.querySelectorAll('.demo-prompt-btn');
 
 // ============================================
 // INITIALIZATION
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
   setupEventListeners();
-  checkApiConnection();
+  checkApiConnection({ silent: true });
 });
 
 function setupEventListeners() {
   // Auth method selector
   authMethodBtns.forEach(btn => {
     btn.addEventListener('click', () => switchAuthMethod(btn.dataset.method));
+  });
+
+  startGuidedDemoBtn?.addEventListener('click', () => startDemoScenario('guided'));
+  startSafetyDemoBtn?.addEventListener('click', () => startDemoScenario('safety'));
+  demoPromptButtons.forEach(button => {
+    button.addEventListener('click', () => triggerDemoPrompt(button.dataset.demoPrompt || ''));
   });
 
   // PIN Login screen
@@ -166,6 +243,84 @@ function switchAuthMethod(method) {
       staffLoginForm.style.display = 'flex';
       break;
   }
+}
+
+function updateDemoStatus(isConnected) {
+  if (!demoStatus) return;
+
+  apiAvailable = isConnected;
+
+  if (isConnected) {
+    demoStatus.textContent = 'Live API detected. You can show the real app or use local demo mode for a controlled walkthrough.';
+    demoStatus.className = 'demo-status demo-status-live';
+    return;
+  }
+
+  demoStatus.textContent = 'Live API unavailable. Demo mode is ready with scripted scenarios so you can still present the product confidently.';
+  demoStatus.className = 'demo-status demo-status-fallback';
+}
+
+function startDemoScenario(scenarioKey) {
+  const scenario = demoScenarios[scenarioKey] || demoScenarios.guided;
+
+  demoMode = true;
+  currentDemoScenario = scenarioKey;
+  currentUserId = scenario.userId;
+  currentPin = null;
+  currentPassword = null;
+  currentAvatar = scenario.avatar;
+  currentTheme = scenario.theme;
+  currentSession = `demo-${scenarioKey}-${Date.now()}`;
+  isNewUser = false;
+
+  applyTheme();
+  setupDefaultSelections();
+  renderDemoScenario(scenario);
+  updateDemoControlPanel(scenario);
+  headerAvatar.textContent = currentAvatar;
+  statusText.textContent = scenario.status;
+  messageInput.placeholder = scenario.placeholder;
+  messageInput.disabled = false;
+  sendBtn.disabled = false;
+  loadingIndicator.classList.remove('active');
+
+  switchScreen(loginScreen, chatScreen);
+  updateSettingsDisplay();
+  messageInput.focus();
+}
+
+function renderDemoScenario(scenario) {
+  messageCount = scenario.transcript.length;
+  messagesContainer.innerHTML = scenario.transcript
+    .map(entry => createMessageMarkup(entry.role, entry.content))
+    .join('');
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function updateDemoControlPanel(scenario) {
+  if (!demoControlPanel) return;
+
+  demoControlPanel.hidden = !demoMode;
+
+  if (!demoMode) {
+    return;
+  }
+
+  demoScenarioTitle.textContent = scenario.title;
+  demoScenarioSummary.textContent = scenario.summary;
+  demoPromptButtons.forEach((button, index) => {
+    const prompt = scenario.prompts[index] || '';
+    button.textContent = prompt;
+    button.dataset.demoPrompt = prompt;
+    button.hidden = !prompt;
+  });
+}
+
+function triggerDemoPrompt(prompt) {
+  if (!prompt) return;
+
+  messageInput.value = prompt;
+  sendMessage();
 }
 
 /**
@@ -519,24 +674,35 @@ function loadSettings() {
 // ============================================
 // CHAT FUNCTIONS
 // ============================================
-async function checkApiConnection() {
+async function checkApiConnection(options = {}) {
+  const { silent = false } = options;
+
   try {
     const response = await fetch(`${API_URL}/health`);
     if (response.ok) {
       console.log('✓ Connected to CareBridge API');
+      updateDemoStatus(true);
       return true;
     } else {
       console.error('✗ API health check failed');
+      updateDemoStatus(false);
       return false;
     }
   } catch (error) {
     console.error('✗ Cannot connect to API:', error.message);
-    showNotification('Cannot connect to server. Make sure the app is running on port 3000.');
+    updateDemoStatus(false);
+    if (!silent) {
+      showNotification('Cannot connect to server. Make sure the app is running on port 3000.');
+    }
     return false;
   }
 }
 
 async function startChat() {
+  demoMode = false;
+  updateDemoControlPanel(demoScenarios[currentDemoScenario]);
+  messageInput.placeholder = 'Type your thoughts... (or just chat.)';
+
   // Save settings to database
   await saveSettingsToDatabase();
 
@@ -559,6 +725,15 @@ async function startChat() {
 }
 
 async function createSession() {
+  if (demoMode) {
+    currentSession = `demo-${currentDemoScenario}-${Date.now()}`;
+    const scenario = demoScenarios[currentDemoScenario] || demoScenarios.guided;
+    renderDemoScenario(scenario);
+    statusText.textContent = scenario.status;
+    updateSettingsDisplay();
+    return;
+  }
+
   try {
     statusText.textContent = 'Starting new session...';
     
@@ -600,6 +775,24 @@ async function sendMessage() {
   messageCount++;
 
   try {
+    if (demoMode) {
+      const demoReply = getDemoReply(message);
+
+      statusText.textContent = demoReply.status;
+      await new Promise(resolve => setTimeout(resolve, 450));
+      addMessageToUI('assistant', demoReply.reply);
+      messageCount++;
+
+      if (demoReply.note) {
+        await new Promise(resolve => setTimeout(resolve, 250));
+        addMessageToUI('assistant', demoReply.note);
+        messageCount++;
+      }
+
+      updateSettingsDisplay();
+      return;
+    }
+
     // Always attempt streaming in browser
     const supportsStreaming = true;
 
@@ -754,6 +947,57 @@ function addMessageToUI(role, content) {
   return messageDiv;
 }
 
+function createMessageMarkup(role, content) {
+  const avatarDisplay = role === 'assistant' ? currentAvatar : '👤';
+
+  return `
+    <div class="message ${role}">
+      <div class="avatar">${avatarDisplay}</div>
+      <div class="content">
+        <p>${escapeHtml(content)}</p>
+      </div>
+    </div>
+  `;
+}
+
+function getDemoReply(message) {
+  const normalized = message.toLowerCase();
+
+  if (normalized.includes('safe') || normalized.includes('unsafe') || normalized.includes('scared') || normalized.includes('afraid')) {
+    return {
+      status: 'Demo: staff follow-up would be flagged',
+      reply: 'Thank you for saying that directly. The companion should respond calmly, encourage the young person to remain connected to immediate support, and surface a documented need for timely staff assessment.',
+      note: 'Demo note: in the live product, staff would receive an alert and concise summary that supports review, documentation, and follow-up within facility protocols.'
+    };
+  }
+
+  if (normalized.includes('family') || normalized.includes('visit') || normalized.includes('call')) {
+    return {
+      status: 'Demo: reflection and pattern capture',
+      reply: 'Family contact can bring up several emotions at once. A strong response here would validate the feeling, explore what shifted after the visit or call, and capture themes the care team may want to review later.'
+    };
+  }
+
+  if (normalized.includes('calm') || normalized.includes('bedtime') || normalized.includes('cope')) {
+    return {
+      status: 'Demo: supportive coaching',
+      reply: 'A helpful response here would walk through one manageable grounding step, such as slowing breathing, naming what feels most intense, or identifying one routine that usually helps before bed.'
+    };
+  }
+
+  if (normalized.includes('private') || normalized.includes('privacy') || normalized.includes('local')) {
+    return {
+      status: 'Demo: privacy-first positioning',
+      reply: 'This project is designed around facility-controlled deployment, so a program can choose local hosting and keep transcripts, alerts, and model operations under its own governance.'
+    };
+  }
+
+  return {
+    status: 'Demo: supportive response',
+    reply: 'In a live session, this is where the companion would reflect the young person’s message, ask a gentle follow-up, and help staff notice patterns if repeated concerns begin to emerge.'
+  };
+}
+
 // ============================================
 // SETTINGS FUNCTIONS
 // ============================================
@@ -783,15 +1027,17 @@ function updateSettingsDisplay() {
 
 function startNewChat() {
   closeSettings();
-  messagesContainer.innerHTML = `
-    <div class="message assistant">
-      <div class="avatar">${currentAvatar}</div>
-      <div class="content">
-        <p>Hi there! 👋 I'm CareBridge Companion. I'm here to listen and support you. How are you doing today?</p>
-      </div>
-    </div>
-  `;
-  messageCount = 0;
+  if (demoMode) {
+    createSession();
+    messageInput.focus();
+    return;
+  }
+
+  messagesContainer.innerHTML = createMessageMarkup(
+    'assistant',
+    "Hi there! 👋 I'm CareBridge Companion. I'm here to listen and support you. How are you doing today?"
+  );
+  messageCount = 1;
   createSession();
   messageInput.focus();
 }

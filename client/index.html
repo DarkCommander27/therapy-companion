@@ -10,114 +10,154 @@
   <div class="app">
     <!-- Login Screen -->
     <div id="loginScreen" class="screen active">
-      <div class="login-container">
-        <div class="login-header">
-          <h1>CareBridge Companion 🤖</h1>
-          <p>Multi-Device Secure Access</p>
+      <div class="login-layout">
+        <div class="login-container">
+          <div class="login-header">
+            <h1>CareBridge Companion 🤖</h1>
+            <p>Multi-Device Secure Access</p>
+          </div>
+
+          <!-- Auth Method Selector -->
+          <div class="auth-method-selector">
+            <button class="auth-method-btn active" data-method="pin">
+              <span class="method-icon">🔐</span>
+              <span class="method-text">PIN Login</span>
+            </button>
+            <button class="auth-method-btn" data-method="password">
+              <span class="method-icon">🔑</span>
+              <span class="method-text">Password Login</span>
+            </button>
+            <button class="auth-method-btn" data-method="staff">
+              <span class="method-icon">👔</span>
+              <span class="method-text">Staff Login</span>
+            </button>
+          </div>
+
+          <!-- PIN Login Form -->
+          <div class="login-form active" id="pinLoginForm">
+            <div class="form-group">
+              <label for="userIdInput">User ID:</label>
+              <input type="text" id="userIdInput" placeholder="Enter your user ID" />
+            </div>
+
+            <div class="form-group">
+              <label for="pinInput">PIN (4-digit):</label>
+              <input type="password" id="pinInput" placeholder="Enter your PIN" maxlength="4" />
+            </div>
+
+            <div id="loginStatus" class="status-message"></div>
+
+            <button id="loginBtn" class="btn-primary" style="width: 100%; padding: 12px; margin-top: 20px;">
+              Login / Register
+            </button>
+
+            <div class="login-help">
+              <p>
+                💡 New User? Create a PIN (4 digits) when you first login.
+                <br>Your PIN lets you access your account from any device.
+              </p>
+            </div>
+          </div>
+
+          <!-- Password Login Form -->
+          <div class="login-form" id="passwordLoginForm" style="display: none;">
+            <div class="form-group">
+              <label for="userIdPassword">User ID:</label>
+              <input type="text" id="userIdPassword" placeholder="Enter your user ID" />
+            </div>
+
+            <div class="form-group">
+              <label for="passwordInput">Password:</label>
+              <input type="password" id="passwordInput" placeholder="Enter your password" />
+            </div>
+
+            <div class="password-strength" id="passwordStrength"></div>
+
+            <div id="loginStatusPassword" class="status-message"></div>
+
+            <button id="passwordLoginBtn" class="btn-primary" style="width: 100%; padding: 12px; margin-top: 20px;">
+              Login
+            </button>
+
+            <div class="login-help">
+              <p>
+                💡 Password must be at least 6 characters.
+                <br>Use a strong password to protect your account.
+              </p>
+            </div>
+          </div>
+
+          <!-- Staff Login Form -->
+          <div class="login-form" id="staffLoginForm" style="display: none;">
+            <div class="form-group">
+              <label for="staffEmailUsername">Email or Username:</label>
+              <input type="text" id="staffEmailUsername" placeholder="Enter email or username" />
+            </div>
+
+            <div class="form-group">
+              <label for="staffPassword">Password:</label>
+              <input type="password" id="staffPassword" placeholder="Enter your password" />
+            </div>
+
+            <div class="form-group demo-checkbox-row">
+              <label>
+                <input type="checkbox" id="rememberDevice" />
+                Remember this device
+              </label>
+            </div>
+
+            <div id="loginStatusStaff" class="status-message"></div>
+
+            <button id="staffLoginBtn" class="btn-primary" style="width: 100%; padding: 12px; margin-top: 20px;">
+              Staff Login
+            </button>
+
+            <div class="login-help">
+              <p>
+                👔 Staff members use their email or username to login.
+                <br>This redirects to the staff dashboard with role-based access.
+              </p>
+            </div>
+          </div>
         </div>
 
-        <!-- Auth Method Selector -->
-        <div class="auth-method-selector">
-          <button class="auth-method-btn active" data-method="pin">
-            <span class="method-icon">🔐</span>
-            <span class="method-text">PIN Login</span>
-          </button>
-          <button class="auth-method-btn" data-method="password">
-            <span class="method-icon">🔑</span>
-            <span class="method-text">Password Login</span>
-          </button>
-          <button class="auth-method-btn" data-method="staff">
-            <span class="method-icon">👔</span>
-            <span class="method-text">Staff Login</span>
-          </button>
-        </div>
-
-        <!-- PIN Login Form -->
-        <div class="login-form active" id="pinLoginForm">
-          <div class="form-group">
-            <label for="userIdInput">User ID:</label>
-            <input type="text" id="userIdInput" placeholder="Enter your user ID" />
+        <aside class="demo-launch-panel" aria-label="Demo panel">
+          <div class="demo-panel-header">
+            <span class="demo-badge">Demo Ready</span>
+            <h2>Live Demo Panel</h2>
+            <p>Show the youth experience, staff value, and privacy-first positioning without depending on a backend.</p>
           </div>
 
-          <div class="form-group">
-            <label for="pinInput">PIN (4-digit):</label>
-            <input type="password" id="pinInput" placeholder="Enter your PIN" maxlength="4" />
+          <div id="demoStatus" class="demo-status demo-status-checking">
+            Checking live API availability...
           </div>
 
-          <div id="loginStatus" class="status-message"></div>
-
-          <button id="loginBtn" class="btn-primary" style="width: 100%; padding: 12px; margin-top: 20px;">
-            Login / Register
-          </button>
-
-          <div class="login-help">
-            <p>
-              💡 New User? Create a PIN (4 digits) when you first login.
-              <br>Your PIN lets you access your account from any device.
-            </p>
-          </div>
-        </div>
-
-        <!-- Password Login Form -->
-        <div class="login-form" id="passwordLoginForm" style="display: none;">
-          <div class="form-group">
-            <label for="userIdPassword">User ID:</label>
-            <input type="text" id="userIdPassword" placeholder="Enter your user ID" />
+          <div class="demo-panel-section">
+            <h3>Recommended flow</h3>
+            <ol class="demo-flow-list">
+              <li>Open the youth chat and show the supportive tone.</li>
+              <li>Use the safety scenario to explain how staff follow-up is prompted.</li>
+              <li>Close by emphasizing local deployment and facility-controlled data.</li>
+            </ol>
           </div>
 
-          <div class="form-group">
-            <label for="passwordInput">Password:</label>
-            <input type="password" id="passwordInput" placeholder="Enter your password" />
+          <div class="demo-panel-section">
+            <h3>Launch scenarios</h3>
+            <div class="demo-action-grid">
+              <button id="startGuidedDemoBtn" class="btn btn-primary" type="button">Start Guided Demo</button>
+              <button id="startSafetyDemoBtn" class="btn btn-secondary" type="button">Safety Alert Demo</button>
+            </div>
           </div>
 
-          <div class="password-strength" id="passwordStrength"></div>
-
-          <div id="loginStatusPassword" class="status-message"></div>
-
-          <button id="passwordLoginBtn" class="btn-primary" style="width: 100%; padding: 12px; margin-top: 20px;">
-            Login
-          </button>
-
-          <div class="login-help">
-            <p>
-              💡 Password must be at least 6 characters.
-              <br>Use a strong password to protect your account.
-            </p>
+          <div class="demo-panel-section">
+            <h3>Talking points</h3>
+            <ul class="demo-talking-points">
+              <li>Supportive conversation, not therapy or diagnosis.</li>
+              <li>Staff visibility comes through summaries and alerts, not staff-to-youth messaging.</li>
+              <li>Local deployment keeps transcripts and models under facility control.</li>
+            </ul>
           </div>
-        </div>
-
-        <!-- Staff Login Form -->
-        <div class="login-form" id="staffLoginForm" style="display: none;">
-          <div class="form-group">
-            <label for="staffEmailUsername">Email or Username:</label>
-            <input type="text" id="staffEmailUsername" placeholder="Enter email or username" />
-          </div>
-
-          <div class="form-group">
-            <label for="staffPassword">Password:</label>
-            <input type="password" id="staffPassword" placeholder="Enter your password" />
-          </div>
-
-          <div class="form-group">
-            <label>
-              <input type="checkbox" id="rememberDevice" />
-              Remember this device
-            </label>
-          </div>
-
-          <div id="loginStatusStaff" class="status-message"></div>
-
-          <button id="staffLoginBtn" class="btn-primary" style="width: 100%; padding: 12px; margin-top: 20px;">
-            Staff Login
-          </button>
-
-          <div class="login-help">
-            <p>
-              👔 Staff members use their email or username to login.
-              <br>This redirects to the staff dashboard with role-based access.
-            </p>
-          </div>
-        </div>
+        </aside>
       </div>
     </div>
 
@@ -217,6 +257,19 @@
             </div>
           </div>
           <button id="settingsBtn" class="btn-icon" title="Settings">⚙️</button>
+        </div>
+
+        <div id="demoControlPanel" class="demo-control-panel" hidden>
+          <div class="demo-control-copy">
+            <span class="demo-badge">Demo Mode</span>
+            <h2 id="demoScenarioTitle">Guided Demo</h2>
+            <p id="demoScenarioSummary">Walk through a supportive youth check-in with suggested prompts.</p>
+          </div>
+          <div class="demo-prompt-grid">
+            <button class="demo-prompt-btn" type="button" data-demo-prompt="I am feeling anxious after a family visit."></button>
+            <button class="demo-prompt-btn" type="button" data-demo-prompt="I do not feel safe going back to my room right now."></button>
+            <button class="demo-prompt-btn" type="button" data-demo-prompt="What could help me calm down before bedtime?"></button>
+          </div>
         </div>
 
         <!-- Messages -->

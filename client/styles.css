@@ -98,11 +98,19 @@ body {
   padding: 20px;
 }
 
+.login-layout {
+  width: 100%;
+  max-width: 1180px;
+  display: grid;
+  grid-template-columns: minmax(320px, 420px) minmax(360px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
 .login-container {
   background: var(--card-bg);
   border-radius: 16px;
   padding: 40px;
-  max-width: 400px;
   width: 100%;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
 }
@@ -218,6 +226,109 @@ body {
 .form-group {
   display: flex;
   align-items: center;
+}
+
+.demo-checkbox-row {
+  justify-content: flex-start;
+}
+
+.demo-checkbox-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.demo-launch-panel {
+  background:
+    radial-gradient(circle at top right, rgba(44, 122, 123, 0.2), transparent 38%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(240, 249, 250, 0.96));
+  border: 1px solid rgba(44, 122, 123, 0.14);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 16px 44px rgba(16, 42, 46, 0.12);
+}
+
+.demo-panel-header {
+  margin-bottom: 22px;
+}
+
+.demo-panel-header h2 {
+  font-size: 28px;
+  line-height: 1.1;
+  margin: 12px 0 10px;
+}
+
+.demo-panel-header p {
+  color: rgba(16, 42, 46, 0.75);
+  max-width: 48ch;
+}
+
+.demo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(44, 122, 123, 0.12);
+  color: var(--accent-color);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.demo-status {
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 22px;
+}
+
+.demo-status-checking {
+  background: rgba(255, 193, 7, 0.14);
+  color: #7a5d00;
+}
+
+.demo-status-live {
+  background: rgba(46, 125, 50, 0.12);
+  color: #206728;
+}
+
+.demo-status-fallback {
+  background: rgba(229, 57, 53, 0.1);
+  color: #a22a29;
+}
+
+.demo-panel-section + .demo-panel-section {
+  margin-top: 24px;
+}
+
+.demo-panel-section h3 {
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.demo-flow-list,
+.demo-talking-points {
+  padding-left: 18px;
+  color: rgba(16, 42, 46, 0.85);
+}
+
+.demo-flow-list li,
+.demo-talking-points li {
+  margin-bottom: 8px;
+}
+
+.demo-action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.demo-action-grid .btn {
+  width: 100%;
 }
 
 .form-group input[type="checkbox"] + label {
@@ -452,6 +563,52 @@ body {
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.demo-control-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(260px, 1fr);
+  gap: 18px;
+  margin: 18px 20px 0;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 249, 250, 0.95));
+  border: 1px solid rgba(44, 122, 123, 0.14);
+  box-shadow: 0 10px 24px rgba(16, 42, 46, 0.08);
+}
+
+.demo-control-copy h2 {
+  font-size: 20px;
+  margin: 10px 0 8px;
+}
+
+.demo-control-copy p {
+  color: rgba(16, 42, 46, 0.78);
+  font-size: 14px;
+}
+
+.demo-prompt-grid {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.demo-prompt-btn {
+  padding: 12px 14px;
+  border: 1px solid rgba(44, 122, 123, 0.22);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--text-color);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.demo-prompt-btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent-color);
+  box-shadow: 0 8px 18px rgba(44, 122, 123, 0.08);
 }
 
 .header-content {
@@ -769,6 +926,20 @@ body {
    RESPONSIVE
    ============================================ */
 @media (max-width: 768px) {
+  .login-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .login-container,
+  .demo-launch-panel {
+    padding: 24px;
+  }
+
+  .demo-action-grid,
+  .demo-control-panel {
+    grid-template-columns: 1fr;
+  }
+
   .setup-container {
     padding: 20px;
   }
@@ -799,6 +970,14 @@ body {
 }
 
 @media (max-width: 480px) {
+  .demo-panel-header h2 {
+    font-size: 24px;
+  }
+
+  .demo-launch-panel {
+    padding: 20px;
+  }
+
   .setup-container {
     padding: 15px;
   }

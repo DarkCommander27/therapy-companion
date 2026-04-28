@@ -2,7 +2,22 @@
 
 A supportive AI check-in companion designed to help youth in residential care engage with care teams through empathetic, safe conversations. CareBridge Companion generates safety briefings and alerts that help staff respond quickly and consistently to youth needs.
 
-**Status:** ✅ **Production Ready** | Full implementation verified with break-glass emergency access (121/121 tests passing)
+**Status:** Pilot-stage working prototype in active testing and refinement
+
+**Repository:** https://github.com/DarkCommander27/CareBridge-Companion
+
+---
+
+## For Evaluators
+
+If you are reviewing this repository for evaluation or feedback:
+
+- Start with this README for the project overview and boundaries
+- Run `npm install` and `npm start`, then open `http://127.0.0.1:3000` or `http://localhost:3000`
+- Use the landing page demo panel to launch the guided demo or safety-alert demo
+- Review the docs folder for architecture, safeguarding, security, and West Virginia alignment materials
+- Treat the current build as a pilot-stage system rather than a production deployment
+- For questions, feedback, or a walkthrough request, open a GitHub issue in this repository or contact the repository owner through GitHub
 
 ---
 
@@ -63,6 +78,10 @@ npm start
 
 The application will be available at **http://localhost:3000**
 
+### Demo Mode
+
+The landing page includes a demo panel with guided scenarios for presenting the product concept. This is useful when you want to walk someone through the youth experience, safety-alert concept, and privacy-first positioning without depending on a full backend workflow.
+
 ### Verify Installation
 
 ```bash
@@ -106,23 +125,23 @@ tail -f logs/*.log
 
 ## Security Features
 
-CareBridge Companion includes comprehensive security hardening:
+CareBridge Companion includes security hardening work across sanitization, encryption, access controls, and audit logging. The repository also includes security and integration-oriented test suites that are being used to stabilize the project during the current testing phase.
 
 | Feature | Implementation | Tests |
 |---------|---|---|
-| **XSS Prevention** | Input sanitization with whitelist | ✅ 12 tests |
-| **NoSQL Injection** | Query operator sanitization | ✅ 5 tests |
-| **Password Security** | bcryptjs with 10-round salting | ✅ 6 tests |
-| **Data Encryption** | AES-256 for sensitive fields | ✅ 5 tests |
-| **HTTP Security Headers** | HSTS, CSP, X-Frame-Options | ✅ 8 tests |
-| **PII Masking** | Email, phone, credit card masking | ✅ 5 tests |
-| **Rate Limiting** | Configurable request limits | ✅ 3 tests |
-| **CORS Protection** | Origin whitelisting | ✅ 2 tests |
-| **Error Handling** | Sensitive data protection in errors | ✅ 8 tests |
-| **Integration Tests** | End-to-end security workflows | ✅ 27 tests |
-| **Break-Glass Access** | Emergency safeguarding access with audit logging | ✅ 41 tests |
+| **XSS Prevention** | Input sanitization with whitelist | Included in test suite |
+| **NoSQL Injection** | Query operator sanitization | Included in test suite |
+| **Password Security** | bcryptjs with salting | Included in test suite |
+| **Data Encryption** | AES-256 for sensitive fields | Included in test suite |
+| **HTTP Security Headers** | HSTS, CSP, X-Frame-Options | Included in test suite |
+| **PII Masking** | Email, phone, credit card masking | Included in test suite |
+| **Rate Limiting** | Configurable request limits | Included in test suite |
+| **CORS Protection** | Origin whitelisting | Included in test suite |
+| **Error Handling** | Sensitive data protection in errors | Included in test suite |
+| **Integration Workflows** | End-to-end security and feature coverage | Included in test suite |
+| **Break-Glass Access** | Emergency safeguarding access with audit logging | Included in test suite |
 
-**All 121 comprehensive security & functionality tests passing** ✅
+The codebase contains substantial security and integration coverage, but the overall system should still be described as under active testing and bug-fixing rather than production-certified.
 
 ---
 
@@ -326,15 +345,9 @@ npm run test:watch
 npm run test:coverage
 ```
 
-**Test Results:**
-```
-Test Suites: 3 passed
-Tests:       121 passed, 0 failed
-  ✅ Phase 4: 53 security tests (sanitization, encryption, headers, etc.)
-  ✅ Phase 5: 27 integration tests (end-to-end workflows)
-  ✅ Break-Glass: 41 emergency access tests (safeguarding, audit logging)
-Time:        ~15 seconds
-```
+**Current testing note:**
+
+The repository includes targeted authentication, security, integration, and break-glass test suites. These tests are part of the current stabilization effort and should be treated as validation work in progress rather than as a production certification signal.
 
 ---
 
@@ -357,7 +370,7 @@ To integrate a local AI model:
 1. Install Ollama: https://ollama.ai
 2. Pull a model:
    ```bash
-   ollama pull llama2
+  ollama pull llama3.1:8b
    ```
 3. Start Ollama:
    ```bash
@@ -367,6 +380,7 @@ To integrate a local AI model:
    ```env
    LLAMA_ENABLED=true
    LLAMA_API_URL=http://localhost:11434
+  LLAMA_MODEL=llama3.1:8b
    ```
 5. Restart the server
 

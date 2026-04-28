@@ -5,7 +5,6 @@
  * - CSP (Content Security Policy)
  * - X-Frame-Options (Clickjacking prevention)
  * - X-Content-Type-Options (MIME sniffing prevention)
- * - X-XSS-Protection (Legacy XSS filter)
  * - Referrer-Policy (Information leakage prevention)
  * - Permissions-Policy (Feature access control)
  */
@@ -91,13 +90,6 @@ function securityHeadersMiddleware() {
 
     // X-Content-Type-Options - Prevent MIME sniffing
     noSniff: true,
-
-    // X-XSS-Protection - Legacy XSS filter (redundant with CSP)
-    xssFilter: {
-      mode: 'block',
-      reportUri: '/api/security/xss-report'
-    },
-
     // Referrer-Policy - Control referrer information
     referrerPolicy: {
       policy: 'strict-origin-when-cross-origin'

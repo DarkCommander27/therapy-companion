@@ -9,7 +9,7 @@ const logger = require('../utils/logger');
 class LlamaService {
   constructor() {
     this.apiUrl = process.env.LLAMA_API_URL || 'http://localhost:11434';
-    this.model = process.env.LLAMA_MODEL || 'llama2:7b';
+    this.model = process.env.LLAMA_MODEL || 'llama3.1:8b';
     this.timeout = parseInt(process.env.LLAMA_TIMEOUT || '30000');
     this.temperature = parseFloat(process.env.LLAMA_TEMPERATURE || '0.7');
     this.maxTokens = parseInt(process.env.LLAMA_MAX_TOKENS || '500');
