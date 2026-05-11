@@ -89,17 +89,23 @@ app.use('/api/chat', logAvailabilityStatus);
 
 logger.info('Availability check middleware applied');
 
+const isDemoMode = process.env.DEMO_MODE === 'true';
+
 // ========================================
 // 3.5 ENVIRONMENT VALIDATION
 // ========================================
 
 function validateEnvironment() {
-  const required = ['MONGODB_URI', 'JWT_SECRET'];
+  const required = isDemoMode ? ['JWT_SECRET'] : ['MONGODB_URI', 'JWT_SECRET'];
   const missing = required.filter(key => !process.env[key]);
 
   if (missing.length > 0) {
     logger.warn(`⚠️ Missing environment variables: ${missing.join(', ')}`);
     logger.warn('Some features may not work correctly. See .env.example for setup.');
+  }
+
+  if (isDemoMode) {
+    logger.info('Demo mode enabled - skipping database-dependent startup for scripted demos');
   }
 
   // Warn about Ollama if enabled
@@ -255,6 +261,11 @@ app.use(errorHandler);
  */
 async function initializeServices() {
   try {
+    if (isDemoMode) {
+      logger.info('Demo mode startup complete');
+      return;
+    }
+
     // Connect to database
     const dbConnected = await connectDatabase();
 

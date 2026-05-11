@@ -6,6 +6,13 @@ const Conversation = require('../models/Conversation');
 const { asyncHandler } = require('../middleware/errorHandler');
 const logger = require('../utils/logger');
 
+const isDemoMode = process.env.DEMO_MODE === 'true';
+
+function buildDemoSessionId(userId) {
+  const safeUserId = userId || 'demo-user';
+  return `demo-live-${safeUserId}-${Date.now()}`;
+}
+
 /**
  * POST /api/chat
  * Main chat endpoint with full conversation history storage and streaming support
@@ -23,7 +30,7 @@ const logger = require('../utils/logger');
 router.post(
   '/api/chat',
   asyncHandler(async (req, res) => {
-    const { message, sessionId, userId, companionId } = req.body;
+    const { message, sessionId, userId, companionId, contextHistory } = req.body;
 
     // === VALIDATION ===
     if (!message || message.trim().length === 0) {
@@ -55,6 +62,94 @@ router.post(
         fallback: true,
         response: "I'm here to listen. What's on your mind?",
         message: 'Model health check failed. Using template response.',
+      });
+    }
+
+    if (isDemoMode) {
+      const mood = llamaService.extractMood(message);
+      const safetyFlags = llamaService.detectSafetyFlags(message);
+      const demoSessionId = sessionId || buildDemoSessionId(userId);
+      const demoContextHistory = Array.isArray(contextHistory)
+        ? contextHistory
+            .filter((entry) => entry && typeof entry.content === 'string' && (entry.role === 'user' || entry.role === 'assistant'))
+            .slice(-8)
+            .map((entry) => ({ role: entry.role, content: entry.content }))
+        : [];
+      const acceptsStreaming =
+        req.headers.accept === 'text/event-stream' || req.query.stream === 'true';
+
+      if (acceptsStreaming && llamaService.streamEnabled) {
+        res.setHeader('Content-Type', 'text/event-stream');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Connection', 'keep-alive');
+
+        let fullResponse = '';
+        let tokensGenerated = 0;
+        const generateStartTime = Date.now();
+
+        await llamaService.generateResponse(message, demoContextHistory, async (chunk) => {
+          fullResponse = chunk.fullResponse;
+          tokensGenerated = chunk.tokenCount;
+
+          res.write(
+            `data: ${JSON.stringify({
+              chunk: chunk.chunk,
+              isDone: chunk.isDone,
+              tokenCount: chunk.tokenCount,
+            })}\n\n`
+          );
+
+          if (chunk.isDone) {
+            const processingTime = Date.now() - generateStartTime;
+
+            res.write(
+              `data: ${JSON.stringify({
+                done: true,
+                sessionId: demoSessionId,
+                processingTimeMs: processingTime,
+                safetyFlags: safetyFlags.detected ? safetyFlags : null,
+              })}\n\n`
+            );
+
+            logger.info(
+              `✓ Demo-mode streaming response complete - ${tokensGenerated} tokens in ${processingTime}ms`
+            );
+            res.end();
+          }
+        });
+
+        return;
+      }
+
+      const llmResponse = await llamaService.generateResponse(message, demoContextHistory);
+      const validation = llamaService.validateResponse(llmResponse.response);
+
+      if (!validation.isValid) {
+        logger.warn(`Invalid demo-mode response: ${validation.error}`);
+        return res.status(500).json({
+          error: 'Failed to generate valid response',
+          fallback: true,
+          response: "I'm here to listen. Can you tell me more about what you're feeling?",
+        });
+      }
+
+      logger.info(
+        `✓ Demo-mode response generated - ${llmResponse.tokenCount} tokens in ${llmResponse.processingTimeMs}ms`
+      );
+
+      return res.status(200).json({
+        success: true,
+        response: llmResponse.response,
+        sessionId: demoSessionId,
+        metadata: {
+          processingTimeMs: llmResponse.processingTimeMs,
+          tokensUsed: llmResponse.tokenCount,
+          mood: mood.mood,
+          moodScore: mood.score,
+          safetyFlags: safetyFlags.detected ? safetyFlags : null,
+          timestamp: new Date(),
+          demoMode: true,
+        },
       });
     }
 
@@ -274,6 +369,17 @@ router.post(
       });
     }
 
+    if (isDemoMode) {
+      return res.status(201).json({
+        success: true,
+        sessionId: buildDemoSessionId(userId),
+        userId,
+        companionId: companionId || 'carebridge-companion-01',
+        startTime: new Date().toISOString(),
+        demoMode: true,
+      });
+    }
+
     const result = await ConversationManager.createConversation(userId, companionId);
 
     res.status(201).json({
@@ -282,6 +388,26 @@ router.post(
     });
   })
 );
+
+/**
+ * GET /api/chat/health
+ * Health check for Llama model
+ */
+router.get('/api/chat/health', (req, res) => {
+  const isHealthy = llamaService.isModelAvailable();
+  const modelInfo = llamaService.getModelInfo();
+
+  res.status(200).json({
+    enabled: modelInfo.enabled,
+    healthy: isHealthy,
+    model: modelInfo.model,
+    streamEnabled: modelInfo.streamEnabled,
+    temperature: modelInfo.temperature,
+    maxTokens: modelInfo.maxTokens,
+    lastHealthCheck: modelInfo.lastHealthCheck,
+    lastResponseTimeMs: modelInfo.lastResponseTimeMs,
+  });
+});
 
 /**
  * GET /api/chat/:sessionId
@@ -418,23 +544,5 @@ router.post(
     });
   })
 );
-
-/**
- * GET /api/chat/health
- * Health check for Llama model
- */
-router.get('/api/chat/health', (req, res) => {
-  const isHealthy = llamaService.isModelAvailable();
-  const modelInfo = llamaService.getModelInfo();
-
-  res.status(isHealthy ? 200 : 503).json({
-    healthy: isHealthy,
-    model: modelInfo.model,
-    temperature: modelInfo.temperature,
-    maxTokens: modelInfo.maxTokens,
-    lastHealthCheck: modelInfo.lastHealthCheck,
-    lastResponseTimeMs: modelInfo.lastResponseTimeMs,
-  });
-});
 
 module.exports = router;

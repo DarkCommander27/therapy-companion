@@ -5,6 +5,7 @@
   "main": "server/app.js",
   "scripts": {
     "start": "node server/app.js",
+    "demo": "dotenv -e .env.demo -- node server/app.js",
     "dev": "nodemon server/app.js",
     "test": "jest --verbose",
     "test:watch": "jest --watch",

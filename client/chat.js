@@ -19,6 +19,15 @@ let currentAuthMethod = 'pin'; // 'pin', 'password', or 'staff'
 let demoMode = false;
 let currentDemoScenario = 'guided';
 let apiAvailable = false;
+let demoUseLiveLlama = true;
+let demoConversationHistory = [];
+let demoModelHealth = {
+  enabled: false,
+  healthy: false,
+  model: null,
+  streamEnabled: false,
+  checked: false
+};
 
 const demoScenarios = {
   guided: {
@@ -109,6 +118,8 @@ const loginStatusStaff = document.getElementById('loginStatusStaff');
 const demoStatus = document.getElementById('demoStatus');
 const startGuidedDemoBtn = document.getElementById('startGuidedDemoBtn');
 const startSafetyDemoBtn = document.getElementById('startSafetyDemoBtn');
+const demoLlamaToggle = document.getElementById('demoLlamaToggle');
+const demoLlamaStatus = document.getElementById('demoLlamaStatus');
 
 // Auth Method Selector
 const authMethodBtns = document.querySelectorAll('.auth-method-btn');
@@ -130,6 +141,9 @@ const demoControlPanel = document.getElementById('demoControlPanel');
 const demoScenarioTitle = document.getElementById('demoScenarioTitle');
 const demoScenarioSummary = document.getElementById('demoScenarioSummary');
 const demoPromptButtons = document.querySelectorAll('.demo-prompt-btn');
+const restartDemoBtn = document.getElementById('restartDemoBtn');
+
+const DEMO_MEMORY_LIMIT = 8;
 
 // ============================================
 // INITIALIZATION
@@ -137,6 +151,7 @@ const demoPromptButtons = document.querySelectorAll('.demo-prompt-btn');
 document.addEventListener('DOMContentLoaded', () => {
   setupEventListeners();
   checkApiConnection({ silent: true });
+  updateDemoLlamaControls();
 });
 
 function setupEventListeners() {
@@ -147,6 +162,8 @@ function setupEventListeners() {
 
   startGuidedDemoBtn?.addEventListener('click', () => startDemoScenario('guided'));
   startSafetyDemoBtn?.addEventListener('click', () => startDemoScenario('safety'));
+  demoLlamaToggle?.addEventListener('change', handleDemoLlamaToggleChange);
+  restartDemoBtn?.addEventListener('click', restartDemoScenario);
   demoPromptButtons.forEach(button => {
     button.addEventListener('click', () => triggerDemoPrompt(button.dataset.demoPrompt || ''));
   });
@@ -260,7 +277,137 @@ function updateDemoStatus(isConnected) {
   demoStatus.className = 'demo-status demo-status-fallback';
 }
 
-function startDemoScenario(scenarioKey) {
+function shouldUseLiveDemoResponses() {
+  return demoMode && demoUseLiveLlama && apiAvailable && demoModelHealth.healthy;
+}
+
+function updateDemoLlamaControls() {
+  if (!demoLlamaToggle || !demoLlamaStatus) return;
+
+  const liveAvailable = apiAvailable && demoModelHealth.healthy;
+  const modelLabel = demoModelHealth.model ? ` (${demoModelHealth.model})` : '';
+
+  demoLlamaToggle.checked = liveAvailable && demoUseLiveLlama;
+  demoLlamaToggle.disabled = !liveAvailable;
+
+  if (demoLlamaToggle.checked) {
+    demoLlamaStatus.textContent = `Live Llama${modelLabel} is active for demo replies.`;
+    demoLlamaStatus.className = 'demo-model-status live';
+    return;
+  }
+
+  if (liveAvailable) {
+    demoLlamaStatus.textContent = `Live Llama${modelLabel} is available. Turn on the switch to use live demo replies.`;
+    demoLlamaStatus.className = 'demo-model-status live';
+    return;
+  }
+
+  if (!apiAvailable) {
+    demoLlamaStatus.textContent = 'Scripted demo replies are active. Connect the app server to enable the live-model toggle.';
+    demoLlamaStatus.className = 'demo-model-status unavailable';
+    return;
+  }
+
+  if (!demoModelHealth.checked) {
+    demoLlamaStatus.textContent = 'Checking whether a local Llama model is available for demo mode...';
+    demoLlamaStatus.className = 'demo-model-status';
+    return;
+  }
+
+  if (!demoModelHealth.enabled) {
+    demoLlamaStatus.textContent = 'Scripted demo replies are active. Live Llama is disabled on this server.';
+    demoLlamaStatus.className = 'demo-model-status unavailable';
+    return;
+  }
+
+  demoLlamaStatus.textContent = 'Scripted demo replies are active. Live Llama is not currently healthy or reachable.';
+  demoLlamaStatus.className = 'demo-model-status unavailable';
+}
+
+async function refreshDemoModelHealth() {
+  if (!apiAvailable) {
+    demoModelHealth = {
+      enabled: false,
+      healthy: false,
+      model: null,
+      streamEnabled: false,
+      checked: true
+    };
+    demoUseLiveLlama = false;
+    updateDemoLlamaControls();
+    return demoModelHealth;
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/api/chat/health`);
+    const data = await response.json();
+
+    demoModelHealth = {
+      enabled: data.enabled !== false,
+      healthy: response.ok && data.healthy === true,
+      model: data.model || null,
+      streamEnabled: data.streamEnabled === true,
+      checked: true
+    };
+  } catch (error) {
+    console.warn('Demo model health check failed:', error);
+    demoModelHealth = {
+      enabled: false,
+      healthy: false,
+      model: null,
+      streamEnabled: false,
+      checked: true
+    };
+  }
+
+  demoUseLiveLlama = demoModelHealth.healthy;
+  localStorage.setItem('carebridge-demo-live-llama', demoUseLiveLlama ? 'true' : 'false');
+
+  if (!demoModelHealth.healthy) {
+    demoUseLiveLlama = false;
+  }
+
+  updateDemoLlamaControls();
+  return demoModelHealth;
+}
+
+async function handleDemoLlamaToggleChange(event) {
+  const requested = event.target.checked;
+
+  if (requested) {
+    await refreshDemoModelHealth();
+
+    if (!demoModelHealth.healthy) {
+      demoUseLiveLlama = false;
+      updateDemoLlamaControls();
+      showNotification('Live Llama is not available right now. The demo will stay in scripted mode.');
+      return;
+    }
+
+    demoUseLiveLlama = true;
+    localStorage.setItem('carebridge-demo-live-llama', 'true');
+    updateDemoLlamaControls();
+
+    if (demoMode) {
+      currentSession = null;
+      await createSession();
+      statusText.textContent = `Demo mode: live replies via ${demoModelHealth.model || 'local model'}`;
+    }
+
+    return;
+  }
+
+  demoUseLiveLlama = false;
+  localStorage.setItem('carebridge-demo-live-llama', 'false');
+  updateDemoLlamaControls();
+
+  if (demoMode) {
+    const scenario = demoScenarios[currentDemoScenario] || demoScenarios.guided;
+    statusText.textContent = scenario.status;
+  }
+}
+
+async function startDemoScenario(scenarioKey) {
   const scenario = demoScenarios[scenarioKey] || demoScenarios.guided;
 
   demoMode = true;
@@ -286,15 +433,44 @@ function startDemoScenario(scenarioKey) {
 
   switchScreen(loginScreen, chatScreen);
   updateSettingsDisplay();
+
+  if (demoUseLiveLlama) {
+    await refreshDemoModelHealth();
+
+    if (demoModelHealth.healthy) {
+      currentSession = null;
+      await createSession();
+      statusText.textContent = `Demo mode: live replies via ${demoModelHealth.model || 'local model'}`;
+    }
+  }
+
   messageInput.focus();
 }
 
+async function restartDemoScenario() {
+  await startDemoScenario(currentDemoScenario);
+}
+
 function renderDemoScenario(scenario) {
+  demoConversationHistory = scenario.transcript.map((entry) => ({
+    role: entry.role,
+    content: entry.content,
+  }));
   messageCount = scenario.transcript.length;
   messagesContainer.innerHTML = scenario.transcript
     .map(entry => createMessageMarkup(entry.role, entry.content))
     .join('');
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function getDemoContextHistory() {
+  return demoConversationHistory.slice(-DEMO_MEMORY_LIMIT);
+}
+
+function appendDemoConversation(role, content) {
+  if (!demoMode || !content) return;
+
+  demoConversationHistory.push({ role, content });
 }
 
 function updateDemoControlPanel(scenario) {
@@ -308,6 +484,7 @@ function updateDemoControlPanel(scenario) {
 
   demoScenarioTitle.textContent = scenario.title;
   demoScenarioSummary.textContent = scenario.summary;
+  updateDemoLlamaControls();
   demoPromptButtons.forEach((button, index) => {
     const prompt = scenario.prompts[index] || '';
     button.textContent = prompt;
@@ -682,15 +859,27 @@ async function checkApiConnection(options = {}) {
     if (response.ok) {
       console.log('✓ Connected to CareBridge API');
       updateDemoStatus(true);
+      await refreshDemoModelHealth();
       return true;
     } else {
       console.error('✗ API health check failed');
       updateDemoStatus(false);
+      updateDemoLlamaControls();
       return false;
     }
   } catch (error) {
     console.error('✗ Cannot connect to API:', error.message);
     updateDemoStatus(false);
+    demoModelHealth = {
+      enabled: false,
+      healthy: false,
+      model: null,
+      streamEnabled: false,
+      checked: true
+    };
+    demoUseLiveLlama = false;
+    localStorage.setItem('carebridge-demo-live-llama', 'false');
+    updateDemoLlamaControls();
     if (!silent) {
       showNotification('Cannot connect to server. Make sure the app is running on port 3000.');
     }
@@ -725,7 +914,7 @@ async function startChat() {
 }
 
 async function createSession() {
-  if (demoMode) {
+  if (demoMode && !shouldUseLiveDemoResponses()) {
     currentSession = `demo-${currentDemoScenario}-${Date.now()}`;
     const scenario = demoScenarios[currentDemoScenario] || demoScenarios.guided;
     renderDemoScenario(scenario);
@@ -735,7 +924,7 @@ async function createSession() {
   }
 
   try {
-    statusText.textContent = 'Starting new session...';
+    statusText.textContent = demoMode ? 'Preparing live demo session...' : 'Starting new session...';
     
     const response = await fetch(`${API_URL}/api/chat/start`, {
       method: 'POST',
@@ -763,7 +952,9 @@ async function createSession() {
 async function sendMessage() {
   const message = messageInput.value.trim();
   
-  if (!message || !currentSession) return;
+  if (!message) return;
+
+  if (!currentSession && !(demoMode && shouldUseLiveDemoResponses())) return;
 
   // Disable input during send
   messageInput.disabled = true;
@@ -775,26 +966,36 @@ async function sendMessage() {
   messageCount++;
 
   try {
-    if (demoMode) {
+    const demoContextHistory = demoMode ? getDemoContextHistory() : [];
+
+    if (demoMode && !shouldUseLiveDemoResponses()) {
       const demoReply = getDemoReply(message);
 
       statusText.textContent = demoReply.status;
       await new Promise(resolve => setTimeout(resolve, 450));
       addMessageToUI('assistant', demoReply.reply);
       messageCount++;
+      appendDemoConversation('user', message);
+      appendDemoConversation('assistant', demoReply.reply);
 
       if (demoReply.note) {
         await new Promise(resolve => setTimeout(resolve, 250));
         addMessageToUI('assistant', demoReply.note);
         messageCount++;
+        appendDemoConversation('assistant', demoReply.note);
       }
 
       updateSettingsDisplay();
       return;
     }
 
-    // Always attempt streaming in browser
-    const supportsStreaming = true;
+    if (demoMode && shouldUseLiveDemoResponses() && (!currentSession || currentSession.startsWith('demo-'))) {
+      await createSession();
+
+      if (!currentSession) {
+        throw new Error('Failed to prepare live demo session');
+      }
+    }
 
     const fetchOptions = {
       method: 'POST',
@@ -806,6 +1007,7 @@ async function sendMessage() {
         sessionId: currentSession,
         userId: currentUserId,
         message: message,
+        contextHistory: demoContextHistory,
         stream: true
       })
     };
@@ -820,21 +1022,43 @@ async function sendMessage() {
       throw new Error(error.error || 'Failed to send message');
     }
 
-    // Always try streaming first (check if body is readable)
-    if (response.body) {
-      try {
-        await handleStreamingResponse(response);
-      } catch (error) {
-        console.warn('Streaming failed, attempting JSON fallback:', error);
-        // If streaming fails, we can't retry since body is consumed
-        // But the error will be caught below
-      }
+    const contentType = response.headers.get('content-type') || '';
+
+    let assistantReply = '';
+
+    if (contentType.includes('text/event-stream') && response.body) {
+      assistantReply = await handleStreamingResponse(response);
+    } else {
+      const data = await response.json();
+      assistantReply = handleNonStreamingResponse(data);
     }
+
+    appendDemoConversation('user', message);
+    appendDemoConversation('assistant', assistantReply);
 
     statusText.textContent = 'Ready to chat';
     messageCount++;
   } catch (error) {
     console.error('Error sending message:', error);
+
+    if (demoMode && shouldUseLiveDemoResponses()) {
+      demoUseLiveLlama = false;
+      localStorage.setItem('carebridge-demo-live-llama', 'false');
+      updateDemoLlamaControls();
+
+      const demoReply = getDemoReply(message);
+      addMessageToUI('assistant', demoReply.reply);
+      appendDemoConversation('user', message);
+      appendDemoConversation('assistant', demoReply.reply);
+      if (demoReply.note) {
+        addMessageToUI('assistant', demoReply.note);
+        appendDemoConversation('assistant', demoReply.note);
+      }
+      statusText.textContent = 'Demo mode: switched back to scripted replies';
+      showNotification('Live Llama failed during demo mode, so the app switched back to scripted replies.');
+      return;
+    }
+
     showNotification(`Error: ${error.message}`);
     addMessageToUI('assistant', `Sorry, I encountered an error: ${error.message}. Please try again.`);
     statusText.textContent = 'Error occurred';
@@ -906,6 +1130,10 @@ async function handleStreamingResponse(response) {
             if (json.isDone) {
               statusText.textContent = 'Message received';
             }
+
+            if (json.sessionId) {
+              currentSession = json.sessionId;
+            }
           } catch (e) {
             // Invalid JSON line, skip
           }
@@ -918,6 +1146,8 @@ async function handleStreamingResponse(response) {
       throw new Error('No response received from server');
     }
 
+    return fullResponse;
+
   } catch (error) {
     console.error('Streaming error:', error);
     throw error;
@@ -925,7 +1155,11 @@ async function handleStreamingResponse(response) {
 }
 
 function handleNonStreamingResponse(data) {
+  if (data.sessionId) {
+    currentSession = data.sessionId;
+  }
   addMessageToUI('assistant', data.response);
+  return data.response;
 }
 
 function addMessageToUI(role, content) {

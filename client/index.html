@@ -264,11 +264,27 @@
             <span class="demo-badge">Demo Mode</span>
             <h2 id="demoScenarioTitle">Guided Demo</h2>
             <p id="demoScenarioSummary">Walk through a supportive youth check-in with suggested prompts.</p>
+            <div class="demo-model-controls">
+              <label class="demo-toggle-row" for="demoLlamaToggle">
+                <span class="demo-toggle-copy">
+                  <strong>Use live Llama</strong>
+                  <span>Switch between scripted demo replies and live local-model responses.</span>
+                </span>
+                <span class="demo-toggle-switch">
+                  <input type="checkbox" id="demoLlamaToggle" />
+                  <span class="demo-toggle-slider"></span>
+                </span>
+              </label>
+              <p id="demoLlamaStatus" class="demo-model-status">Scripted demo replies are active.</p>
+            </div>
           </div>
           <div class="demo-prompt-grid">
             <button class="demo-prompt-btn" type="button" data-demo-prompt="I am feeling anxious after a family visit."></button>
             <button class="demo-prompt-btn" type="button" data-demo-prompt="I do not feel safe going back to my room right now."></button>
             <button class="demo-prompt-btn" type="button" data-demo-prompt="What could help me calm down before bedtime?"></button>
+          </div>
+          <div class="demo-session-actions">
+            <button id="restartDemoBtn" class="btn btn-secondary" type="button">Erase Demo Memory + Restart</button>
           </div>
         </div>
 

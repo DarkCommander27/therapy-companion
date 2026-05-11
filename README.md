@@ -13,7 +13,7 @@ A supportive AI check-in companion designed to help youth in residential care en
 If you are reviewing this repository for evaluation or feedback:
 
 - Start with this README for the project overview and boundaries
-- Run `npm install` and `npm start`, then open `http://127.0.0.1:3000` or `http://localhost:3000`
+- Run `npm install` and then `npm run demo`, then open `http://127.0.0.1:3000` or `http://localhost:3000`
 - Use the landing page demo panel to launch the guided demo or safety-alert demo
 - Review the docs folder for architecture, safeguarding, security, and West Virginia alignment materials
 - Treat the current build as a pilot-stage system rather than a production deployment
@@ -76,11 +76,29 @@ npm run dev
 npm start
 ```
 
+**Scripted demo mode**:
+```bash
+npm run demo
+```
+
 The application will be available at **http://localhost:3000**
 
 ### Demo Mode
 
 The landing page includes a demo panel with guided scenarios for presenting the product concept. This is useful when you want to walk someone through the youth experience, safety-alert concept, and privacy-first positioning without depending on a full backend workflow.
+
+### Demo Startup
+
+If you want to run the same scripted demo flow used for repository walkthroughs:
+
+```bash
+npm install
+npm run demo
+```
+
+This uses [.env.demo](/workspaces/CareBridge-Companion/.env.demo), keeps Llama integration off, and skips the database connection so the landing page demo panel is immediately usable.
+
+If you want the demo-mode toggle to use a live local model, edit [.env.demo](/workspaces/CareBridge-Companion/.env.demo) and set `LLAMA_ENABLED=true` with the correct `LLAMA_API_URL` and `LLAMA_MODEL` values for your machine.
 
 ### Verify Installation
 
@@ -522,6 +540,13 @@ See [DEVELOPMENT.md](DEVELOPMENT.md) for more troubleshooting.
 
 We welcome contributions that strengthen privacy, safety, and youth-centered care.
 
+Contributor guidance and project expectations live in:
+
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+- [GOVERNANCE.md](GOVERNANCE.md)
+- [SECURITY.md](SECURITY.md)
+
 ### Before Contributing
 1. Read [ARCHITECTURE.md](docs/ARCHITECTURE.md)
 2. Review [LGBTQ_AFFIRMING_POLICY.md](docs/LGBTQ_AFFIRMING_POLICY.md)
@@ -542,6 +567,8 @@ We welcome contributions that strengthen privacy, safety, and youth-centered car
 
 MIT License — See [LICENSE](LICENSE) for details
 
+Unless explicitly stated otherwise, contributions to this repository are accepted under the same MIT license.
+
 ---
 
 ## Support & Questions
@@ -549,10 +576,12 @@ MIT License — See [LICENSE](LICENSE) for details
 For questions about:
 - **Implementation**: See [docs/](docs/) folder
 - **Development**: See [DEVELOPMENT.md](DEVELOPMENT.md)
+- **Contributing & Governance**: See [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md), and [GOVERNANCE.md](GOVERNANCE.md)
+- **Security Reporting**: See [SECURITY.md](SECURITY.md)
 - **Safety & Policy**: Contact your facility's safeguarding lead
 
 ---
 
-**Last Updated:** March 2026
+**Last Updated:** May 2026
 
-**Status:** Production Ready ✅ | All 121 tests passing ✅ | Break-glass emergency access ✅ | Client-Server integration complete ✅
+**Status:** Pilot-stage working prototype in active testing and documentation hardening | Security and integration test coverage in place | Break-glass emergency access implemented
